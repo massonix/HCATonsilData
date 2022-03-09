@@ -77,6 +77,33 @@ write.csv(files_df, file = path_to_csv, row.names = FALSE, quote = FALSE)
 ```
 
 
+Now that we have the URL we can download the files:
+
+```{r}
+# Create data directories
+data_dir <- here("inst/scripts/rna_raw_data")
+out_dir <- here("inst/scripts/HCATonsilDataRNA")
+dir.create(data_dir, recursive = TRUE, showWarnings = TRUE)
+dir.create(out_dir, recursive = TRUE, showWarnings = TRUE)
+
+
+# Read and filter list of files to download
+files_df <- read.csv(file = path_to_csv, header = TRUE)
+files_df <- files_df[files_df$dataset == "RNA", ]
+
+
+# Downlaod
+options(timeout = 720)
+for (i in seq_len(nrow(files_df))) {
+  out_file <- file.path(data_dir, files_df$file_name[i])
+  if (!file.exists(out_file)) {
+    download.file(url = files_df$url[i], destfile = out_file)
+  }
+}
+```
+
+
+
 # Session Information
 
 ```{r}
