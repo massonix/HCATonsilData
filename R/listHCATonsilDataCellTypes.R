@@ -1,3 +1,14 @@
+#' List available cell types for a dataset of the tonsil cell atlas
+#'
+#' @param dataset Either 'RNA', 'ATAC', 'CITE', or 'Spatial'
+#'
+#' @export
+#'
+#' @return A character vector with the available cell types for the indicated
+#'   dataset.
+#' @examples
+#' listHCATonsilDataCellTypes(dataset = "RNA")
+#'
 listHCATonsilDataCellTypes <- function(dataset) {
   if (dataset == "RNA") {
     c(
@@ -11,6 +22,6 @@ listHCATonsilDataCellTypes <- function(dataset) {
   } else if (dataset == "Spatial") {
     "All"
   } else {
-    stop("Invalid 'dataset' (must be either 'RNA', 'ATAC', 'CITE' or 'Spatial'´")
+    stop("Invalid 'dataset' (must be either 'RNA', 'ATAC', 'CITE' or 'Spatial'")
   }
 }
