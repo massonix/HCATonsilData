@@ -1,0 +1,85 @@
+---
+title: "Download and preprocess the tonsil atlas data (RNA)"
+author: "Ramon Massoni-Badosa"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(width = 100)
+```
+
+
+# Introduction
+
+Here we will download and process the Seurat objects associated with the tonsil cell atlas to prepare them for submission to [`ExperimentHub`](https://bioconductor.org/packages/release/bioc/html/ExperimentHub.html). We will follow a similar style and structure as the one used for the [`TabulaMurisSenisData`](https://github.com/fmicompbio/TabulaMurisSenisData) pacakge.
+
+# Loading required packages
+
+```{r packages}
+library(Seurat)
+library(DelayedArray)
+library(HDF5Array)
+library(SingleCellExperiment)
+library(here)
+library(dplyr)
+library(stringr)
+```
+
+
+# Downloading the Seurat objects from Zenodo
+
+The Seurat objects derived from our tonsil atlas have been archived as .rds files in Zenodo under the record [6340174](https://zenodo.org/record/6340174). To generate the URL's for each package we used the [zenodo_get]() package as follows:
+
+```{bash}
+zenodo_get 10.5281/zenodo.6340174 -w tmp.txt
+paste tmp.txt md5sums.txt | sed 's/\t/,/' | sed 's/ \{1,\}/,/g' > tonsil_atlas_rds_files.csv
+```
+
+
+Let us read and curate the "tonsil_atlas_rds_files.csv" to include the file name, URL, cell type and dataset for each object:
+
+```{r}
+# Read data
+path_to_csv <- here("inst/scripts/tonsil_atlas_rds_files.csv")
+files_df <- read.csv(file = path_to_csv, header = FALSE)
+colnames(files_df) <- c("url", "file_id", "file_name")
+
+
+# Set cell type and dataset variables
+files_df$cell_type <- files_df$file_name %>%
+  str_remove("20220215_") %>%
+  str_remove("_seurat_obj.*$")
+files_df$cell_type[files_df$cell_type == "CD4_T"] <- "CD4 T"
+files_df$cell_type[files_df$cell_type == "CD8_T"] <- "CD8 T"
+files_df$cell_type[files_df$cell_type == "NBC_MBC"] <- "NBC/MBC"
+files_df$cell_type[files_df$cell_type == "ILC_NK"] <- "ILC/NK"
+files_df$cell_type[str_detect(files_df$cell_type, "tonsil")] <- "All"
+files_df$dataset <- case_when(
+  str_detect(files_df$file_name, "atac") ~ "ATAC",
+  str_detect(files_df$file_name, "spatial") ~ "Spatial",
+  str_detect(files_df$file_name, "cite") ~ "CITE",
+  TRUE ~ "RNA"
+)
+
+
+# Reorder columns
+new_order <- c("file_name", "file_id", "cell_type", "dataset", "url")
+files_df <- files_df[, new_order]
+
+
+# Rewrite
+write.csv(files_df, file = path_to_csv, row.names = FALSE, quote = FALSE)
+```
+
+
+# Session Information
+
+```{r}
+sessionInfo()
+```
+
