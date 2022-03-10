@@ -33,13 +33,14 @@ library(stringr)
 
 # Downloading the Seurat objects from Zenodo
 
-The Seurat objects derived from our tonsil atlas have been archived as .rds files in Zenodo under the record [6340174](https://zenodo.org/record/6340174). To generate the URL's for each package we used the [zenodo_get]() package as follows:
+The Seurat objects derived from our tonsil atlas have been archived as .rds files in Zenodo under the record [6340174](https://zenodo.org/record/6340174). To generate the URL's for each package we used the [zenodo_get](https://github.com/dvolgyes/zenodo_get) package as follows:
 
 ```{bash}
 zenodo_get 10.5281/zenodo.6340174 -w tmp.txt
 paste tmp.txt md5sums.txt | sed 's/\t/,/' | sed 's/ \{1,\}/,/g' > tonsil_atlas_rds_files.csv
 ```
 
+TODO: Run md5sum (https://stat.ethz.ch/R-manual/R-devel/library/tools/html/md5sum.html)
 
 Let us read and curate the "tonsil_atlas_rds_files.csv" to include the file name, URL, cell type and dataset for each object:
 
@@ -82,7 +83,7 @@ Now that we have the URL we can download the files:
 ```{r}
 # Create data directories
 data_dir <- here("inst/scripts/rna_raw_data")
-out_dir <- here("inst/scripts/HCATonsilDataRNA")
+out_dir <- here("data_to_upload/HCATonsilData/1.0/tonsil-atlas-rna")
 dir.create(data_dir, recursive = TRUE, showWarnings = TRUE)
 dir.create(out_dir, recursive = TRUE, showWarnings = TRUE)
 
