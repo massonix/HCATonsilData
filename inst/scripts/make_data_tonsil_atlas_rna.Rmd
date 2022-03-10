@@ -22,10 +22,10 @@ Here we will download and process the Seurat objects associated with the tonsil 
 
 ```{r packages}
 library(Seurat)
-library(DelayedArray)
-library(HDF5Array)
 library(SingleCellExperiment)
+library(HDF5Array)
 library(here)
+library(glue)
 library(dplyr)
 library(stringr)
 ```
@@ -93,12 +93,83 @@ files_df <- files_df[files_df$dataset == "RNA", ]
 
 
 # Downlaod
-options(timeout = 720)
+options(timeout = 1440)
 for (i in seq_len(nrow(files_df))) {
   out_file <- file.path(data_dir, files_df$file_name[i])
   if (!file.exists(out_file)) {
     download.file(url = files_df$url[i], destfile = out_file)
   }
+}
+```
+
+
+# Process Seurat objects to extract relevant slots
+
+```{r}
+for (f in files_df$file_name) {
+  print(f)
+  
+  # Read Seurat object
+  seurat <- readRDS(file.path(data_dir, f))
+  cell_type <- files_df[files_df$file_name == f, "cell_type"]
+  cell_type <- str_replace(cell_type, "(/| )", "_")
+  dataset <- files_df[files_df$file_name == f, "dataset"]
+  
+  # Extract and save reductions
+  if ("pca" %in% names(seurat@reductions)) {
+    tmpmat <- Embeddings(seurat, "pca")
+    path_to_save_dims <- file.path(out_dir, glue("{cell_type}_{dataset}_pca.rds"))
+    saveRDS(tmpmat, path_to_save_dims)
+  }
+  if ("harmony" %in% names(seurat@reductions)) {
+    tmpmat <- Embeddings(seurat, "harmony")
+    path_to_save_dims <- file.path(out_dir, glue("{cell_type}_{dataset}_harmony.rds"))
+    saveRDS(tmpmat, path_to_save_dims)
+  }
+  if ("umap" %in% names(seurat@reductions)) {
+    tmpmat <- Embeddings(seurat, "umap")
+    path_to_save_dims <- file.path(out_dir, glue("{cell_type}_{dataset}_umap.rds"))
+    saveRDS(tmpmat, path_to_save_dims)
+  }
+  
+  # Extract and save rowData and colData
+  saveRDS(
+    seurat@meta.data,
+    file.path(out_dir, glue("{cell_type}_{dataset}_coldata.rds"))
+  )
+  rowdata <- data.frame(gene = rownames(seurat))
+  rowdata$highly_variable <- ifelse(
+    rowdata$gene %in% rownames(seurat[["RNA"]]@scale.data),
+    TRUE,
+    FALSE
+  )
+  saveRDS(rowdata, file.path(out_dir, glue("{cell_type}_{dataset}_rowdata.rds")))
+
+  # Extract and save raw and processed counts
+  cts <- seurat[["RNA"]]@counts
+  h5_file <- file.path(out_dir, glue("{cell_type}_{dataset}_counts.h5"))
+  if (!file.exists(h5_file)) {
+    mat_h5 <- writeHDF5Array(
+      cts,
+      filepath = h5_file,
+      name = "counts",
+      chunkdim = HDF5Array::getHDF5DumpChunkDim(dim(cts))
+    )
+  }
+  mat <- seurat[["RNA"]]@data
+  h5_file <- file.path(out_dir, glue("{cell_type}_{dataset}_processed.h5"))
+  if (!file.exists(h5_file)) {
+    mat_h5 <- writeHDF5Array(
+      mat,
+      filepath = h5_file,
+      name = "processed",
+      chunkdim = HDF5Array::getHDF5DumpChunkDim(dim(mat))
+    )
+  }
+  
+  # Remove Seurat object
+  rm(seurat)
+  gc()
 }
 ```
 
