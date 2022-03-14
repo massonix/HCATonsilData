@@ -144,6 +144,7 @@ for (f in files_df$file_name) {
     TRUE,
     FALSE
   )
+  rownames(rowdata) <- rowdata$gene
   saveRDS(rowdata, file.path(out_dir, glue("{cell_type}_{dataset}_rowdata.rds")))
 
   # Extract and save raw and processed counts
