@@ -1,0 +1,67 @@
+---
+title: "HCATonsilData"
+author: "Ramon Massoni-Badosa, Federico Marini & Alan O'Callaghan"
+date: "`r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('HCATonsilData')`"
+output: 
+  BiocStyle::html_document:
+    toc_float: true
+vignette: >
+  %\VignetteIndexEntry{HCATonsilData}
+  %\VignetteEncoding{UTF-8}
+  %\VignettePackage{HCATonsilData}
+  %\VignetteKeywords{GeneExpression, RNASeq, SingleCell, ATACSeq, Spatial, CITESeq}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, message = FALSE}
+library(SingleCellExperiment)
+library(HCATonsilData)
+```
+
+# Introduction
+
+This package provides access to the to the processed scRNA-seq, scATAC-seq,
+10X Multiome, CITE-seq and Spatial Transcriptomics (10X Visium) from the 
+tonsil atlas dataset. All data in this package was processed from
+[`Seurat`](https://satijalab.org/seurat/ objects stored in Zenodo. 
+All datasets are provided as `SingleCellExperiment` objects for easy access 
+and use within the Bioconductor ecosystem. In addition, the objects are easily
+convertable to `Seurat` with the `as.Seurat`, and to
+[AnnData](https://anndata.readthedocs.io/en/latest/) objects (Python) with the
+[`zellconverter`](https://www.bioconductor.org/packages/release/bioc/html/zellkonverter.html)
+package.
+
+
+# Overview of the data set
+
+
+# RNA
+
+TODO: also provide a built-in dataframe that contains, for each cell type,
+the most important markers, as well as the DOI/PMID of the papers used to 
+assign a cell type label.
+# ATAC
+
+# CITE-seq
+
+# Spatial
+
+# Explore data with iSEE
+
+
+# Session info
+
+```{r}
+sessionInfo()
+```
+
