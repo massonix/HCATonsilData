@@ -12,7 +12,7 @@ library(glue)
 
 
 # Read data
-path_to_csv <- here("inst/scripts/tonsil_atlas_rds_files.csv")
+path_to_csv <- here("inst/scripts/tonsil-atlas-rds-files.csv")
 files_df <- read.csv(file = path_to_csv, header = TRUE)
 files_df <- files_df[files_df$dataset == "RNA", ]
 
@@ -40,7 +40,7 @@ out_df <- files_df %>%
   mutate(
     Title = glue("Tonsil Atlas RNA {cell_type} {outs2}"),
     Description = glue("{descs} for the Tonsil Cell Atlas {cell_type} scRNA-seq/Multiome dataset"),
-    RDataPath = glue("HCATonsilData/1.0/tonsil-atlas-rna/{cell_type}_{dataset}_{outs}{suffix}"),
+    RDataPath = glue("HCATonsilData/1.0/RNA/{cell_type}_{dataset}_{outs}{suffix}"),
     BiocVersion = "3.14",
     Genome = "GRCh38",
     SourceType = "HDF5",

@@ -18,6 +18,7 @@ options(width = 100)
 
 Here we will download and process the Seurat objects associated with the tonsil cell atlas to prepare them for submission to [`ExperimentHub`](https://bioconductor.org/packages/release/bioc/html/ExperimentHub.html). We will follow a similar style and structure as the one used for the [`TabulaMurisSenisData`](https://github.com/fmicompbio/TabulaMurisSenisData) pacakge.
 
+
 # Loading required packages
 
 ```{r packages}
@@ -26,8 +27,10 @@ library(SingleCellExperiment)
 library(HDF5Array)
 library(here)
 library(glue)
+library(readr)
 library(dplyr)
 library(stringr)
+library(tools)
 ```
 
 
@@ -37,17 +40,17 @@ The Seurat objects derived from our tonsil atlas have been archived as .rds file
 
 ```{bash}
 zenodo_get 10.5281/zenodo.6340174 -w tmp.txt
-paste tmp.txt md5sums.txt | sed 's/\t/,/' | sed 's/ \{1,\}/,/g' > tonsil_atlas_rds_files.csv
+paste tmp.txt md5sums.txt | sed 's/\t/,/' | sed 's/ \{1,\}/,/g' > tonsil-atlas-zenodo-get-output.csv
 ```
 
-TODO: Run md5sum (https://stat.ethz.ch/R-manual/R-devel/library/tools/html/md5sum.html)
 
-Let us read and curate the "tonsil_atlas_rds_files.csv" to include the file name, URL, cell type and dataset for each object:
+Let us read and curate the "tonsil-atlas-rds-files.csv" to include the file name, URL, cell type and dataset for each object:
 
 ```{r}
 # Read data
-path_to_csv <- here("inst/scripts/tonsil_atlas_rds_files.csv")
-files_df <- read.csv(file = path_to_csv, header = FALSE)
+path_to_csv1 <- here("inst/scripts/tonsil-atlas-zenodo-get-output.csv")
+path_to_csv2 <- here("inst/scripts/tonsil-atlas-rds-files.csv")
+files_df <- read.csv(file = path_to_csv1, header = FALSE)
 colnames(files_df) <- c("url", "file_id", "file_name")
 
 
@@ -74,7 +77,7 @@ files_df <- files_df[, new_order]
 
 
 # Rewrite
-write.csv(files_df, file = path_to_csv, row.names = FALSE, quote = FALSE)
+write.csv(files_df, file = path_to_csv2, row.names = FALSE, quote = FALSE)
 ```
 
 
@@ -83,13 +86,13 @@ Now that we have the URL we can download the files:
 ```{r}
 # Create data directories
 data_dir <- here("inst/scripts/rna_raw_data")
-out_dir <- here("data_to_upload/HCATonsilData/1.0/tonsil-atlas-rna")
+out_dir <- here("inst/scripts/HCATonsilData/1.0/RNA")
 dir.create(data_dir, recursive = TRUE, showWarnings = TRUE)
 dir.create(out_dir, recursive = TRUE, showWarnings = TRUE)
 
 
 # Read and filter list of files to download
-files_df <- read.csv(file = path_to_csv, header = TRUE)
+files_df <- read.csv(file = path_to_csv2, header = TRUE)
 files_df <- files_df[files_df$dataset == "RNA", ]
 
 
@@ -100,6 +103,13 @@ for (i in seq_len(nrow(files_df))) {
   if (!file.exists(out_file)) {
     download.file(url = files_df$url[i], destfile = out_file)
   }
+  
+  # Check MD5
+  md5_original <- files_df$file_id[i]
+  md5_download <- md5sum(out_file)
+  if (!md5_original == md5_download) {
+    stop("The file is corrupted!")
+  }
 }
 ```
 
@@ -107,6 +117,18 @@ for (i in seq_len(nrow(files_df))) {
 # Process Seurat objects to extract relevant slots
 
 ```{r}
+# Get gene information
+genes_df <- read_tsv(
+  here("inst/extdata/features.tsv.gz"),
+  col_names = c("ensembl_id", "symbol", "type")
+) %>%
+  filter(type == "Gene Expression") %>%
+  as.data.frame()
+gene_ids <- genes_df$ensembl_id
+names(gene_ids) <- genes_df$symbol
+
+
+# Process
 for (f in files_df$file_name) {
   print(f)
   
@@ -135,16 +157,18 @@ for (f in files_df$file_name) {
   
   # Extract and save rowData and colData
   saveRDS(
-    seurat@meta.data,
+    as(seurat@meta.data, "DataFrame"),
     file.path(out_dir, glue("{cell_type}_{dataset}_coldata.rds"))
   )
-  rowdata <- data.frame(gene = rownames(seurat))
+  rowdata <- data.frame(gene_name = rownames(seurat))
   rowdata$highly_variable <- ifelse(
     rowdata$gene %in% rownames(seurat[["RNA"]]@scale.data),
     TRUE,
     FALSE
   )
-  rownames(rowdata) <- rowdata$gene
+  rowdata$gene_id <- gene_ids[rowdata$gene_name]
+  rowdata <- as(rowdata, "DataFrame")
+  rownames(rowdata) <- rowdata$gene_name
   saveRDS(rowdata, file.path(out_dir, glue("{cell_type}_{dataset}_rowdata.rds")))
 
   # Extract and save raw and processed counts
@@ -174,7 +198,6 @@ for (f in files_df$file_name) {
   gc()
 }
 ```
-
 
 
 # Session Information
