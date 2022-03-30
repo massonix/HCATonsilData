@@ -41,7 +41,7 @@ out_df <- files_df %>%
     Title = glue("Tonsil Atlas RNA {cell_type} {outs2}"),
     Description = glue("{descs} for the Tonsil Cell Atlas {cell_type} scRNA-seq/Multiome dataset"),
     RDataPath = glue("HCATonsilData/1.0/RNA/{cell_type}_{dataset}_{outs}{suffix}"),
-    BiocVersion = "3.14",
+    BiocVersion = "3.15",
     Genome = "GRCh38",
     SourceType = "HDF5",
     SourceUrl = "https://zenodo.org/record/6340174",
