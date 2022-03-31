@@ -13,6 +13,7 @@ library(glue)
 
 # Read data
 path_to_csv <- here("inst/scripts/tonsil-atlas-rds-files.csv")
+path_to_data <- here("inst/scripts/HCATonsilData")
 files_df <- read.csv(file = path_to_csv, header = TRUE)
 files_df <- files_df[files_df$dataset == "RNA", ]
 
@@ -59,6 +60,14 @@ out_df <- files_df %>%
          Coordinate_1_based, DataProvider, Maintainer, RDataClass,
          DispatchClass)
 dir.create(here("inst/extdata"))
+
+
+# Check that all files exist
+files <- file.path("HCATonsilData", list.files(path_to_data, recursive = TRUE))
+out_df <- out_df[out_df$RDataPath %in% files, ]
+
+
+# Write
 write_delim(
   out_df,
   file = here("inst/extdata/metadata-tonsil-atlas-rna.csv"),
