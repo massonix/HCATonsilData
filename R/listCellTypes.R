@@ -1,6 +1,6 @@
 #' List available cell types for a dataset of the tonsil cell atlas
 #'
-#' @param dataset Either 'RNA', 'ATAC', 'CITE', or 'Spatial'
+#' @param assayType Either 'RNA', 'ATAC', 'CITE', or 'Spatial'
 #'
 #' @export
 #'
@@ -9,17 +9,17 @@
 #' @examples
 #' listHCATonsilDataCellTypes(dataset = "RNA")
 #'
-listHCATonsilDataCellTypes <- function(dataset) {
-  if (dataset == "RNA") {
+listCellTypes <- function(assayType) {
+  if (assayType == "RNA") {
     c(
       "All", "NBC/MBC", "GCBC", "PC","CD4 T", "Th", "CD8 T", "ILC/NK",
       "myeloid", "FDC", "epithelial", "PDC", "preB", "preT"
     )
-  } else if (dataset == "ATAC") {
+  } else if (assayType == "ATAC") {
     c("All", "NBC/MBC", "GCBC", "PC","CD4 T", "CD8 T", "ILC/NK")
-  } else if (dataset == "CITE") {
+  } else if (assayType == "CITE") {
     c("All", "CD4 T")
-  } else if (dataset == "Spatial") {
+  } else if (assayType == "Spatial") {
     "All"
   } else {
     stop("Invalid 'dataset' (must be either 'RNA', 'ATAC', 'CITE' or 'Spatial'")
