@@ -30,7 +30,7 @@ HCATonsilData <- function(assayType, cellType, processedCounts = TRUE) {
   allowedTypes <- listCellTypes(assayType = assayType)
   if (!(cellType %in% allowedTypes)) {
     stop(
-      "'assay_type' must be included in ",
+      "'assayType' must be included in ",
       paste(allowedTypes, collapse = ", "))
   }
 
@@ -73,7 +73,7 @@ HCATonsilData <- function(assayType, cellType, processedCounts = TRUE) {
   }
   if (processedCounts) {
     prccts <- HDF5Array::HDF5Array(
-      eh[eh$rdatapath == filePaths["counts"]][[1]],
+      eh[eh$rdatapath == filePaths["processedCounts"]][[1]],
       name = "processed"
   )
   SummarizedExperiment::assay(sce, "logcounts", withDimnames = FALSE) <- prccts

@@ -2,7 +2,6 @@
 title: "HCATonsilData"
 author: "Ramon Massoni-Badosa, Federico Marini & Alan O'Callaghan"
 date: "`r BiocStyle::doc_date()`"
-package: "`r BiocStyle::pkg_ver('HCATonsilData')`"
 output: 
   BiocStyle::html_document:
     toc_float: true
@@ -25,7 +24,7 @@ knitr::opts_chunk$set(
 
 ```{r setup, message = FALSE}
 library(SingleCellExperiment)
-library(HCATonsilData)
+# library(HCATonsilData)
 ```
 
 # Introduction
