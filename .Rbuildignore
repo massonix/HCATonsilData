@@ -1,3 +1,6 @@
 ^HCATonsilData\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^inst/scripts/HCATonsilData$
+^inst/scripts/HCATonsilDataRNA$
+^inst/scripts/rna_raw_data$

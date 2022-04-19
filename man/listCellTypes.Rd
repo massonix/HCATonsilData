@@ -17,6 +17,6 @@ dataset.
 List available cell types for a dataset of the tonsil cell atlas
 }
 \examples{
-listHCATonsilDataCellTypes(dataset = "RNA")
+listCellTypes(assayType = "RNA")
 
 }

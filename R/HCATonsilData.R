@@ -18,6 +18,12 @@
 
 #' @export
 #'
+#' @importFrom ExperimentHub ExperimentHub
+#' @importFrom HDF5Array HDF5Array
+#' @importFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom SingleCellExperiment reducedDims
+#' @importFrom SummarizedExperiment assay
+#'
 #' @examples
 HCATonsilData <- function(assayType, cellType, processedCounts = TRUE) {
   # Sanity checks

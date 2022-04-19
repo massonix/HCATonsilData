@@ -7,7 +7,7 @@
 #' @return A character vector with the available cell types for the indicated
 #'   dataset.
 #' @examples
-#' listHCATonsilDataCellTypes(dataset = "RNA")
+#' listCellTypes(assayType = "RNA")
 #'
 listCellTypes <- function(assayType) {
   if (assayType == "RNA") {

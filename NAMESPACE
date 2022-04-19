@@ -2,3 +2,8 @@
 
 export(HCATonsilData)
 export(listCellTypes)
+importFrom(ExperimentHub,ExperimentHub)
+importFrom(HDF5Array,HDF5Array)
+importFrom(SingleCellExperiment,SingleCellExperiment)
+importFrom(SingleCellExperiment,reducedDims)
+importFrom(SummarizedExperiment,assay)
