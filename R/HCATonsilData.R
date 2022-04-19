@@ -1,4 +1,4 @@
-#' Title Access the Tonsil Atlas data (RNA, ATAC, CITE, Spatial)
+#' Access the Tonsil Atlas data (RNA, ATAC, CITE, Spatial)
 #'
 #' The data was downloaded from Zenodo
 #' https://zenodo.org/record/6340174#.YkwQwX9BxH4
@@ -25,7 +25,7 @@
 #' @importFrom SummarizedExperiment assay
 #'
 #' @examples
-HCATonsilData <- function(assayType, cellType, processedCounts = TRUE) {
+HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts = TRUE) {
   # Sanity checks
   allowedAssays <- c("RNA", "ATAC", "CITE", "Spatial")
   if (!(assayType %in% allowedAssays)) {

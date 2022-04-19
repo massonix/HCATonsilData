@@ -9,21 +9,21 @@ test_that("downloading RNA data works", {
   # Test slots and classes
   expect_s4_class(sce, "SingleCellExperiment")
   expect_s4_class(counts(sce), "DelayedMatrix")
-  expect_s4_class(logcounts(sce), "DelayedMatrix")
-  expect_equal(length(reducedDims(sce)), 3)
-  expect_equal(names(reducedDims(sce)), c("PCA", "UMAP", "HARMONY"))
-  expect_s4_class(colData(sce), "DFrame")
-  expect_s4_class(rowData(sce), "DFrame")
+  expect_s4_class(SingleCellExperiment::logcounts(sce), "DelayedMatrix")
+  expect_equal(length(SingleCellExperiment::reducedDims(sce)), 3)
+  expect_equal(names(SingleCellExperiment::reducedDims(sce)), c("PCA", "UMAP", "HARMONY"))
+  expect_s4_class(SingleCellExperiment::colData(sce), "DFrame")
+  expect_s4_class(SingleCellExperiment::rowData(sce), "DFrame")
 
   # Test dimensions
   expect_equal(dim(sce), c(37378, 277))
   expect_equal(dim(counts(sce)), c(37378, 277))
-  expect_equal(dim(logcounts(sce)), c(37378, 277))
-  expect_equal(dim(reducedDim(sce, "PCA")), c(277, 50))
-  expect_equal(dim(reducedDim(sce, "UMAP")), c(277, 2))
-  expect_equal(dim(reducedDim(sce, "HARMONY")), c(277, 50))
-  expect_equal(dim(rowData(sce)), c(37378, 3))
-  expect_equal(dim(colData(sce)), c(277, 30))
+  expect_equal(dim(SingleCellExperiment::logcounts(sce)), c(37378, 277))
+  expect_equal(dim(SingleCellExperiment::reducedDim(sce, "PCA")), c(277, 50))
+  expect_equal(dim(SingleCellExperiment::reducedDim(sce, "UMAP")), c(277, 2))
+  expect_equal(dim(SingleCellExperiment::reducedDim(sce, "HARMONY")), c(277, 50))
+  expect_equal(dim(SingleCellExperiment::rowData(sce)), c(37378, 3))
+  expect_equal(dim(SingleCellExperiment::colData(sce)), c(277, 30))
 
   # Test variables colData()
   vars <- c("barcode", "donor_id", "gem_id", "library_name", "assay", "sex",
@@ -34,7 +34,7 @@ test_that("downloading RNA data works", {
             "G2M.Score", "Phase", "CC.Difference", "annotation_level_1",
             "annotation_figure_1", "annotation_20220215", "UMAP_1_20220215",
             "UMAP_2_20220215")
-  expect_true(all(vars %in% colnames(colData(sce))))
+  expect_true(all(vars %in% colnames(SingleCellExperiment::colData(sce))))
 
   # Test that HCATonsilData generates errors if inputs are incorrect
   expect_error(HCATonsilData(assayType = "DNA"), regexp = NULL)
@@ -49,5 +49,5 @@ test_that("downloading RNA data works", {
     cellType = "epithelial",
     processedCounts = FALSE
   )
-  expect_error(logcounts(sce2), regexp = NULL)
+  expect_error(SingleCellExperiment::logcounts(sce2), regexp = NULL)
 })
