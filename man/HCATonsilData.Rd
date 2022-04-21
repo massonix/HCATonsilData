@@ -2,9 +2,9 @@
 % Please edit documentation in R/HCATonsilData.R
 \name{HCATonsilData}
 \alias{HCATonsilData}
-\title{Title Access the Tonsil Atlas data (RNA, ATAC, CITE, Spatial)}
+\title{Access the Tonsil Atlas data (RNA, ATAC, CITE, Spatial)}
 \usage{
-HCATonsilData(assayType, cellType, processedCounts = TRUE)
+HCATonsilData(assayType = "RNA", cellType = "All", processedCounts = TRUE)
 }
 \arguments{
 \item{assayType}{One of "RNA", "ATAC", "CITE" or "Spatial".}

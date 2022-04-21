@@ -26,6 +26,7 @@ Imports:
 Suggests: 
     knitr,
     rmarkdown,
+    ggplot2,
     testthat (>= 3.0.0),
     iSEE,
     BiocStyle

@@ -13,6 +13,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
+bibliography: HCATonsilData.bib
 ---
 
 ```{r, include = FALSE}
@@ -22,10 +23,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup, message = FALSE}
-library(SingleCellExperiment)
-# library(HCATonsilData)
-```
 
 # Introduction
 
@@ -40,9 +37,9 @@ which makes them an appealing organ for the study of the interplay between
 innate and adaptive immune cells, their role in follicular and germinal center
 development and in the formation of active adaptive immunity and respective
 memory. In addition, tonsils are routinely obtained in hospitals, making them
-an overall great model SLO.
+an overall great model SLO [@ruddle2009secondary].
 
-In the context of the Human Cell Atlas (HCA), we have created a taxonomy of cell
+In the context of the Human Cell Atlas (HCA) [@regev2018human], we have created a taxonomy of cell
 types and states in a human tonsil. Because the transcritpome is just a snapshot
 of a cell's state, we have added other layers to define cell identity: 
 single-cell resolved open chromatin epigenomic landscapes (scATAC-seq and
@@ -51,7 +48,7 @@ repertoire (single-cell B and T cell receptor sequencing; i.e. scBCR-seq and
 scTCR-seq) and spatial transcriptomics (ST) profiles.
 
 The HCATonsilData package aims to provide programmatic and modular access to the
-datasets for the different modalities and cells types of the tonsil atlas.
+datasets of the different modalities and cells types of the tonsil atlas.
 
 
 # Installation
@@ -62,16 +59,17 @@ devtools::install_github("massonix/HCATonsilData", build_vignettes = TRUE)
 
 Once we have installed the package, we can load it:
 
-```{r}
+```{r message=FALSE}
 library(HCATonsilData)
 library(SingleCellExperiment)
 library(ExperimentHub)
+library(ggplot2)
 ```
 
 
 # Overview of the dataset
 
-We obtained a total of ten human tonsils by scRNA-seq. These tonsils covered
+We obtained a total of ten human tonsils. These tonsils covered
 three age groups: kids (n=6, 3-5 years), young adults (n=3, 26-35 years) and
 old adults (n=1, 65 years). Here's a more detailed explanation of the different
 types of assay:
@@ -99,7 +97,7 @@ knitr::include_graphics("tonsil_atlas_umaps.png")
 
 
 The dataset was originally analyzed with [Seurat](https://satijalab.org/seurat/).
-Important links:
+[@hao2021integrated] Important links:
 
 * [Github repository with the full set of Rmd notebooks needed to go from raw expression matrices to the final objects](TODO add link).
 * [Zenodo repository where we deposited the Seurat objects](https://zenodo.org/record/6340174/#.Yl7BH39BxH4).
@@ -112,46 +110,72 @@ Spatial.
 
 ## RNA
 
-There are 3 data modalities that contain transcriptomics data: scRNA-seq,
-Multiome, and CITE-seq. Initially, we aimed to use the 3 modalities to cluster
-cells in our tonsil atlas. However, we noticed that with CITE-seq we
-detected xX and xX fewer genes than with scRNA-seq and Multiome, respectively:
+We can obtain the `SingleCellExperiment` object with transcriptomics (RNA)
+data as follows:
+
+```{r}
+(sce <- HCATonsilData(assayType = "RNA", cellType = "All"))
+table(sce$assay)
+```
+
+
+As you can see, this object consists of 209786 profiled with scRNA-seq (3P)
+and 53513 cells profiled with multiome. Initially, we aimed to also use CITE-seq
+to cluster cells in our tonsil atlas. However, we noticed that with CITE-seq we
+detected 2.75X and 2.98X fewer genes than with scRNA-seq and Multiome, respectively:
+
+```{r eval=FALSE, echo=FALSE}
+df <- colData(sce)[, c("assay", "nFeature_RNA")]
+df <- as.data.frame(df)
+cite <- readRDS("inst/scripts/cite_raw_data/20220215_tonsil_atlas_cite_seurat_obj.rds")
+cite <- cite@meta.data[, c("assay", "nFeature_RNA")]
+df <- rbind(df, cite)
+df$assay <- factor(df$assay, levels = c("3P", "multiome", "CITE-seq"))
+levels(df$assay) <- c("scRNA-seq", "multiome", "CITE-seq")
+colors <- c("#d52f54", "#4bafdd", "#f0b635")
+names(colors) <- levels(df$assay)
+ggplot(df, aes(assay, nFeature_RNA, fill = assay)) +
+  geom_violin() +
+  stat_summary(fun = "mean", geom = "point", color = "black") +
+  labs(x = "", y = "Number of detected genes") +
+  scale_fill_manual(values = colors, breaks = names(colors)) +
+  theme_classic() +
+  theme(legend.position = "none")
+```
 
 ```{r, echo=FALSE, out.width = "100%"}
-knitr::include_graphics("")
+knitr::include_graphics("tonsil_atlas_n_detected_genes.png")
 ```
 
 Because we did not want to bias the clustering towards the modality that
 provides less information, we first focused on scRNA-seq and Multiome together,
 and use CITE-seq to validate the annotation (see below). However, a recent
 benchmarking effort showed that scRNA-seq and single-nuclei RNA-seq (such as
-Multiome) mix very poorly (TODO cite). Indeed, we observed massive batch effects between
-both modalities (see manuscript). To overcome it, we found highly variable
+Multiome) mix very poorly [@mereu2020benchmarking]. Indeed, we observed massive batch effects 
+between both modalities (see manuscript). To overcome it, we found highly variable
 genes (HVG) for each modality independently. We then intersected both sets of
 HVG to remove modality-specific variation. Following principal component
 analysis (PCA), we integrated scRNA-seq and Multiome with Harmony (TODO cite). Harmony
 Harmony scales well to atlas-level dataset and ranks among the best-performing
-tools in different benchmarks (TODO cite). We have automatized this two-step
+tools in different benchmarks [@korsunsky2019fast]. We have automatized this two-step
 approach in [SLOcatoR](https://github.com/massonix/SLOcatoR), an R package that annotates
 transcriptomes and chromatin accessibility profiles from SLO. As shown in the
 manuscript, we successfully corrected for batch effects while preserving
 biological variation.
-Because cell taxonomies are intinsically hierarchical, to cluster cells we
-followed a top-down approach, stratified by levels. In each level, we perform
-the two-step process describe above, which finds finer-grained heterogeneity in
-a recursive manner. Then, we used the batch-corrected principal components
-(harmony components), to calculate a K-nearest neighbor graph (KNN graph).
-Louvain clustering uses this KNN graph to assign a cluster to each cell. In 
-level 1, we identified X main cell populations, which we annotated using
-well-defined marker genes.
-
-To download the full dataset and visualize the annotation at level 1 we can run
-the following:
+To cluster cells we followed a top-down approach, from general to specific, 
+stratified by levels. In each level, we perform the two-step process describe
+above, which finds finer-grained heterogeneity in a recursive manner. Then, we
+used the batch-corrected principal components (harmony components), to calculate
+a K-nearest neighbor graph (KNN graph). Louvain clustering uses this KNN graph
+to assign a cluster to each cell. In level 1, we identified X main cell
+populations, which we annotated using well-defined marker genes.
 
 ```{r}
-sce <- HCATonsilData(assayType = "RNA", cellType = "All")
-# TODO plot annotation level 1
+
 ```
+
+
+
 
 Which return a SingleCellExperiment object. This dataset contains 263,299 cells
 (209786 scRNA-seq, and 53513 Multiome). For each cluster at level 1, we followed
