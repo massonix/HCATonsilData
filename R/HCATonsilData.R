@@ -30,13 +30,13 @@ HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts =
   allowedAssays <- c("RNA", "ATAC", "CITE", "Spatial")
   if (!(assayType %in% allowedAssays)) {
     stop(
-      "'assay_type' must be included in ",
+      "'assayType' must be included in ",
       paste(allowedAssays, collapse = ", "))
   }
   allowedTypes <- listCellTypes(assayType = assayType)
   if (!(cellType %in% allowedTypes)) {
     stop(
-      "'assayType' must be included in ",
+      "'cellType' must be included in ",
       paste(allowedTypes, collapse = ", "))
   }
 

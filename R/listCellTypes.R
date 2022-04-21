@@ -12,7 +12,7 @@
 listCellTypes <- function(assayType) {
   if (assayType == "RNA") {
     c(
-      "All", "NBC/MBC", "GCBC", "PC","CD4 T", "Th", "CD8 T", "ILC/NK",
+      "All", "NBC-MBC", "GCBC", "PC","CD4-T", "Th", "CD8-T", "ILC-NK",
       "myeloid", "FDC", "epithelial", "PDC", "preB", "preT"
     )
   } else if (assayType == "ATAC") {

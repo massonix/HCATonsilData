@@ -7,3 +7,9 @@ inst/doc
 inst/scripts/rna_raw_data/*
 inst/scripts/HCATonsilData/*
 inst/scripts/HCATonsilDataRNA/*
+inst/scripts/cite_raw_data/
+inst/scripts/md5sums.txt
+inst/scripts/tmp.txt
+vignettes/.gitignore
+vignettes/tonsil_atlas_annotation_level_1.png
+

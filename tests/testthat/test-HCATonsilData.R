@@ -50,4 +50,15 @@ test_that("downloading RNA data works", {
     processedCounts = FALSE
   )
   expect_error(SingleCellExperiment::logcounts(sce2), regexp = NULL)
+
+  # Test that
+
+})
+
+
+test_that("All cellTypes exist in ExperimentHub", {
+  eh <- ExperimentHub::ExperimentHub()
+  cellTypes <- HCATonsilData::listCellTypes("RNA")
+  out <- all(sapply(cellTypes, \(.) any(grepl(., eh$rdatapath))))
+  expect_true(out)
 })
