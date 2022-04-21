@@ -167,46 +167,100 @@ stratified by levels. In each level, we perform the two-step process describe
 above, which finds finer-grained heterogeneity in a recursive manner. Then, we
 used the batch-corrected principal components (harmony components), to calculate
 a K-nearest neighbor graph (KNN graph). Louvain clustering uses this KNN graph
-to assign a cluster to each cell. In level 1, we identified X main cell
-populations, which we annotated using well-defined marker genes.
+to assign a cluster to each cell. In level 1, we identified 11 main cell
+populations, which we annotated using well-defined marker genes:
 
 ```{r}
-
+df <- as.data.frame(colData(sce))
+cols <- c("#5A5156", "#E4E1E3", "#F6222E", "#FE00FA", "#16FF32", "#3283FE",
+          "#FEAF16", "#B00068","#1CFFCE",  "#90AD1C", "#2ED9FF") 
+ggplot(df, aes(UMAP_1_level_1, UMAP_2_level_1, col = annotation_level_1)) +
+  geom_point(shape = ".") +
+  scale_color_manual(values = cols) +
+  labs(title = "Annotation Level 1", x = "UMAP1", y = "UMAP2") +
+  theme_classic() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  guides(colour = guide_legend(override.aes = list(size = 2, shape = 16)))
 ```
 
 
-
-
-Which return a SingleCellExperiment object. This dataset contains 263,299 cells
-(209786 scRNA-seq, and 53513 Multiome). For each cluster at level 1, we followed
-multiple levels of integration, clustering, and removal of poor-quality cells.
-Finally, we annotated them to specific cell types and states, which are stored
-in the variable `annotation_20220215`.
+For each cluster at level 1, we followed multiple levels of integration,
+clustering, and removal of poor-quality cells. Finally, we annotated them to
+specific cell types and states, which are stored in the variable
+`annotation_20220215`.
 
 We can dowload a `SingleCellExperiment` object specific to each of the main
 subpopulations defined at level 1 as follows:
 
 ```{r}
 listCellTypes(assayType = "RNA")
-epithelial <- HCATonsilData(assayType = "RNA", cellType = "epithelial")
+(epithelial <- HCATonsilData(assayType = "RNA", cellType = "epithelial"))
+df <- as.data.frame(colData(epithelial))
+ggplot(df, aes(UMAP_1_20220215, UMAP_2_20220215, col = annotation_20220215)) +
+  geom_point() +
+  scale_color_manual(values = cols) +
+  labs(title = "Annotation 20220215", x = "UMAP1", y = "UMAP2") +
+  theme_classic() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
 ```
 
+As we can see, the annotation we are currently using has a date associated with
+it. Initially, we annotated each clusters with the best information we had at
+a given point in time, based on previously published literature and to the best
+of our knowledge. However, annotations are imperfect by nature, and they need
+to be reassessed after new evidence is available or other experts look at the
+data. In this setting, we will add a new column to the `colData` slot of each
+SingleCellExperiment object every time we update the annotation, with the form
+`annotation_date`.
+In addition, future versions of HCATonsilData will contain dataframes that
+allow to traceback the reasoning for each annotation: which markers where used,
+which are the key references, brief explanation of the rationale, etc (TODO).
 
-Explain why we analyzed multiome RNA jointly, not CITE-seq. Include violin plot nFeatures
-integration with harmony
-TODO include annotation level 1 UMAP which motivates the main subtypes.
-TODO: also provide a built-in dataframe that contains, for each cell type,
-the most important markers, as well as the DOI/PMID of the papers used to 
-assign a cell type label.
+Here's a brief explanation of all the variables in the colData slot of the
+`SingleCellExperiment` objects:
+
+
+* barcode: the cell barcode. Combination of [GEM well](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/glossary) and cellranger 10X barcode.
+* donor_id
+* gem_id: we gave a unique hashtag to each GEM well (10X Chip Channel) in our dataset. This allows to traceback all the metadata for a given cell.       
+* library_name: each GEM well can give rise to multiple Illumina libraries (example: multiome, cell hashing, etc.).
+* assay: 3P (scRNA-seq) or multiome
+* sex
+* age
+* age_group: kid, young adult, old adult
+* hospital: hospital where the tonsils where obtained [Hospital Clinic](https://www.clinicbarcelona.org/) or [CIMA](https://cima.cun.es/).
+* UMAP_1_level_1, UMAP_2_level_1: UMAP1 coordinates of the figure 1b of our manuscript
+* nCount_RNA, nFeature_RNA: number of counts and features (genes) detected per cell.
+* pct_mt, pct_ribosomal: percentage of counts that map to mitochondrial (^MT) or ribosomal (^RPS) genes.
+* is_hashed: whether we used [cell hashing](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-018-1603-1) or not.
+* pDNN_hashing, pDNN_scrublet, pDNN_union: proportion of doublet nearest neighbors (pDNN) using different doublet annotations.
+* scrublet_doublet_scores
+* scrublet_predicted_doublet
+* S.Score, G2M.Score Phase, CC.Difference: outputs of the [CellCycleScoring](https://rdrr.io/cran/Seurat/man/CellCycleScoring.html) from `Seurat`.
+* annotation_level_1: annotation used at our level 1 clustering (see above).
+* annotation_figure_1: annotation used in the figure 1 of our manuscript. This annotation consisted of grouping the final subtypes into main cell types that were distinguishable in the UMAP.
+* annotation_20220215: see above.
+* UMAP_1_20220215, UMAP_2_20220215: UMAP coordinates used in figures of the preprint for each cell type.
+
 
 ## ATAC
 
-```{r}
-#code to download specific ATAC seq from zenodo
-```
-
+Coming soon! (TODO)
 
 ## CITE-seq
+
+Coming soon! (TODO) For now you can download the original `Seurat` object with the
+following code:
 
 ```{r}
 #code to download specific CITE seq from zenodo
@@ -214,6 +268,9 @@ assign a cell type label.
 
 
 ## Spatial
+
+Coming soon! (TODO) For now you can download the original `Seurat` object with the
+following code:
 
 ```{r}
 #code to download specific spatialfrom zenodo
@@ -223,6 +280,7 @@ assign a cell type label.
 
 # Explore data with iSEE
 
+Coming soon! (TODO)
 
 # Session information
 
