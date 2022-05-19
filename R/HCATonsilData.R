@@ -86,3 +86,69 @@ HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts =
   }
   sce
 }
+
+#' Information on the Tonsil Data
+#'
+#' Get information on the individual datasets of the Tonsil Atlas data
+#'
+#' @inheritParams HCATonsilData
+#'
+#' @return An info message is generated, and its content is returned invisibly.
+#'
+#' @author Federico Marini
+
+#' @export
+#'
+#' @examples
+#' HCATonsilDataInfo(assayType = "RNA", cellType = "epithelial")
+HCATonsilDataInfo <- function(assayType = "RNA", cellType = "All") {
+  # Sanity checks
+  allowedAssays <- c("RNA", "ATAC", "CITE", "Spatial")
+  if (!(assayType %in% allowedAssays)) {
+    stop(
+      "'assayType' must be included in ",
+      paste(allowedAssays, collapse = ", "))
+  }
+  allowedTypes <- listCellTypes(assayType = assayType)
+  if (!(cellType %in% allowedTypes)) {
+    stop(
+      "'cellType' must be included in ",
+      paste(allowedTypes, collapse = ", "))
+  }
+
+  # Initialize ExperimentHub object
+  eh <- ExperimentHub::ExperimentHub()
+  host <- file.path("HCATonsilData", "1.0", assayType)
+
+  # Define paths
+  suffixes <- c("counts.h5", "processed.h5", "rowdata.rds", "coldata.rds",
+                "pca.rds", "harmony.rds", "umap.rds")
+  names(suffixes) <- c("counts", "processedCounts", "rowData", "colData",
+                       "pca", "harmony", "umap")
+  filePaths <- sapply(suffixes, \(.) {
+    x <- file.path(host, paste(cellType, assayType, ., sep = "_"))
+    x
+  })
+  for (x in filePaths) {
+    if (sum(x == eh$rdatapath) > 1) {
+      stop("Input matched more than one entry!")
+    }
+  }
+
+  # Fetch info instead of creating full sce object
+  rd_sce <- eh[eh$rdatapath == filePaths["rowData"]][[1]]
+  cd_sce <- eh[eh$rdatapath == filePaths["colData"]][[1]]
+
+  # buildup the information string
+  info_sce <- sprintf(
+    "Dataset: %s (assay selected: %s)\nMeasurements available for %d genes in %d cells",
+    cellType,
+    assayType,
+    nrow(rd_sce),
+    nrow(cd_sce)
+  )
+
+  message(info_sce)
+
+  return(invisible(info_sce))
+}
