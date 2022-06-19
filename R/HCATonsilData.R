@@ -84,6 +84,13 @@ HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts =
   )
   SummarizedExperiment::assay(sce, "logcounts", withDimnames = FALSE) <- prccts
   }
+
+  # Update annotations
+  sce <- updateAnnotation(
+    sce = sce,
+    refAnnotation = "20220215",
+    newAnnotation = "20220619"
+  )
   sce
 }
 
