@@ -3,6 +3,7 @@
 export(HCATonsilData)
 export(HCATonsilDataInfo)
 export(listCellTypes)
+export(updateAnnotation)
 importFrom(ExperimentHub,ExperimentHub)
 importFrom(HDF5Array,HDF5Array)
 importFrom(SingleCellExperiment,SingleCellExperiment)

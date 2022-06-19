@@ -16,9 +16,9 @@ listCellTypes <- function(assayType) {
       "myeloid", "FDC", "epithelial", "PDC", "preB", "preT"
     )
   } else if (assayType == "ATAC") {
-    c("All", "NBC/MBC", "GCBC", "PC","CD4 T", "CD8 T", "ILC/NK")
+    c("All", "NBC-MBC", "GCBC", "PC", "CD4-T", "CD8-T", "ILC-NK")
   } else if (assayType == "CITE") {
-    c("All", "CD4 T")
+    c("All", "CD4-T")
   } else if (assayType == "Spatial") {
     "All"
   } else {
