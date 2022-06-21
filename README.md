@@ -16,7 +16,7 @@ This will compile a vignette which documents the whole dataset:
 browseVignettes("HCATonsilData")
 ```
 
-We provide access to SingleCellExperiment objects of the main cellular compartments
+We provide access to `SingleCellExperiment` objects of the main cellular compartments
 described in our manuscript. The function `listCellTypes` prints the available
 cell types for a given assay (RNA, ATAC, CITE or Spatial):
 
@@ -33,8 +33,8 @@ working hard to extend it to other modalities, which are/will be arhived in
 [Zenodo](https://doi.org/10.5281/zenodo.6340174) as [Seurat objects](https://satijalab.org/seurat/).
 
 
-Before installing a SingleCellExperiment object, we can get some information
-(number of genes and cells) with the ``HCATonsilDataInfo()` function:
+Before installing a `SingleCellExperiment` object, we can get some information
+(number of genes and cells) with the `HCATonsilDataInfo()` function:
 
 ``` {r}
 HCATonsilDataInfo(cellType = "CD4-T")
@@ -50,7 +50,7 @@ Dataset: CD4-T (assay selected: RNA)
 Measurements available for 37378 genes in 52307 cells
 ```
 
-To obtain the SingleCellExperiment object associated with a given cell type we use
+To obtain the `SingleCellExperiment` object associated with a given cell type we use
 the `HCATonsilData()` function:
 
 ``` {r}
@@ -78,7 +78,7 @@ altExpNames(0):
 
 # Requirements
 
-The data was uploaded to ExperimentHub in the release 3.15 of Bioconductor, Thus, you need to have
+The data was uploaded to ExperimentHub in the release 3.15 of Bioconductor. Thus, you need to have
 BioC >= 3.15 to be able to use the package. In addition, you will need R >=4.2.
 
 
@@ -86,7 +86,7 @@ BioC >= 3.15 to be able to use the package. In addition, you will need R >=4.2.
 
 Although we have put massive effort in annotating tonsillar cell types, cell type annotations are dynamic by nature. New literature or other interpretations of the
 data can challenge and refine our annotations. To accomodate this, we have developed
-the `updateAnnotation` function, which allows to periodically provide newer annotations as extra columns in the `colData` slot of the SingleCellExperiment
+the `updateAnnotation` function, which allows to periodically provide newer annotations as extra columns in the `colData` slot of the `SingleCellExperiment`
 objects. If you want to contribute in one of these versions of the upcoming annotations,
 please [open an issue](https://github.com/massonix/HCATonsilData/issues/new) and describe your annotation.
 
