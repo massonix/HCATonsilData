@@ -35,3 +35,6 @@ VignetteBuilder: knitr
 URL: https://github.com/massonix/HCATonsilData
 BugReports: https://github.com/massonix/HCATonsilData/issues
 biocViews: SingleCellData, ExperimentData, RNASeqData, ExperimentHub
+Depends: 
+    R (>= 2.10)
+LazyData: true

@@ -91,6 +91,19 @@ HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts =
     refAnnotation = "20220215",
     newAnnotation = "20220619"
   )
+
+
+  # We did some last minute changes to NBC-MBC before publication, let's
+  # reannotate and change the UMAP coords to map with the manuscript
+  if (cellType == "NBC-MBC") {
+    sce <- sce[, NBC_MBC_annotation_df$barcode]
+    sce$annotation_20220619 <- NBC_MBC_annotation_df$annotation_20220619
+    umap_df <- as.matrix(NBC_MBC_annotation_df[, c("UMAP_1", "UMAP_2")])
+    reducedDim(sce, "UMAP") <- umap_df
+  }
+
+
+  # Return
   sce
 }
 
