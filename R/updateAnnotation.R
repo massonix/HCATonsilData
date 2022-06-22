@@ -52,8 +52,9 @@ updateAnnotation <- function(sce,
     "MBC-like_proli2"= "Reactivated proliferative MBCs",
     "MBC-like_proli3" = "Reactivated proliferative MBCs",
     "MBC-like_FCRL4+"= "Reactivated proliferative MBCs",
-    "PC-precursors" = "PC committed LZ GCBC",
-    "class switch MBC" = "csMBC"
+    "PC-precursors" = "PC committed Light Zone GCBC",
+    "class switch MBC" = "csMBC",
+    "Neutrophil Granulocytes" = "Neutrophils"
   )
   oldAnnot <- paste("annotation", refAnnotation, sep = "_")
   newAnnot <- paste("annotation", newAnnotation, sep = "_")
