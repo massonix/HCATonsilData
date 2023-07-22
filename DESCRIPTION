@@ -22,10 +22,12 @@ Imports:
     ExperimentHub,
     SingleCellExperiment,
     HDF5Array,
-    SummarizedExperiment
+    SummarizedExperiment,
+    htmltools,
+    rmarkdown,
+    utils
 Suggests: 
     knitr,
-    rmarkdown,
     ggplot2,
     testthat (>= 3.0.0),
     iSEE,

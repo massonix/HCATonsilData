@@ -30,6 +30,8 @@ TonsilData_glossary <- function() {
 #'
 #' @export
 #'
+#' @importFrom utils browseURL read.table
+#'
 #' @examples
 #' TonsilData_cellinfo()
 #'
@@ -131,6 +133,10 @@ library("htmltools")
 #'
 #' @return
 #' @export
+#'
+#' @importFrom htmltools tags
+#' @importFrom utils browseURL read.table
+#' @importFrom rmarkdown render
 #'
 #' @examples
 #' TonsilData_cellinfo_html("PDC")
