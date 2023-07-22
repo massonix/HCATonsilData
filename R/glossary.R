@@ -120,9 +120,14 @@ library("htmltools")
 
 #' TonsilData_cellinfo_html
 #'
-#' @param cell_type
-#' @param display_plot
-#' @param output_to
+#' @param cell_type String character, used to define the cell type for which the
+#' information will be displayed. Defaults to `NULL` - if left unspecified, the
+#' function returns a list of the possible options
+#' @param display_plot Logical value, defines whether to include or not a plot
+#' for the UMAP of the selected cell type
+#' @param output_to Character value, one of "single_page" or "html_to_embed".
+#' Defines in which form the information is returned, either as an individual page
+#' or simply as HTML code to directly embed into other documents.
 #'
 #' @return
 #' @export
