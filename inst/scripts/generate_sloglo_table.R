@@ -1,6 +1,8 @@
 library("googlesheets4")
 
-sloglo_df <- read_sheet("https://docs.google.com/spreadsheets/d/1myzlfmyh8QjSha3-c3Z32QtoKUhffdjx0A3rj1wJzac/edit#gid=0") |>
+gsheet_url <- "https://docs.google.com/spreadsheets/d/1myzlfmyh8QjSha3-c3Z32QtoKUhffdjx0A3rj1wJzac/edit#gid=0"
+
+sloglo_df <- read_sheet(gsheet_url) |>
   as.data.frame()
 rownames(sloglo_df) <- sloglo_df$annotation_detailed
 
