@@ -246,6 +246,7 @@ TonsilData_cellinfo_html <- function(cell_type = NULL,
 
         # and render this
         browseURL(rmarkdown::render(tmpfile))
+        return(tmpfile)
       } else if (output_to == "html_to_embed") {
         return(cell_html)
       }
