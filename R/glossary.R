@@ -191,7 +191,7 @@ TonsilData_cellinfo_html <- function(cell_type = NULL,
 
 
       refs <- as.character(glossary_df[cell_type, "related_refs"])
-      refs_split <- unlist(strsplit(refs, split = ",", fixed = TRUE))
+      refs_split <- unlist(strsplit(refs, split = ";", fixed = TRUE))
       refs_split_names <- unlist(lapply(
         strsplit(refs_split, split = "|", fixed = TRUE),
         function(arg) arg[1]))
