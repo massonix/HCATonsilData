@@ -22,6 +22,11 @@ for the UMAP of the selected cell type}
 Defines in which form the information is returned, either as an individual page
 or simply as HTML code to directly embed into other documents.}
 }
+\value{
+Either the HTML code generated to be embedded, or a standalone HTML
+page is created - and the location to this temp file is returned as a character
+(default).
+}
 \description{
 TonsilData_cellinfo_html
 }

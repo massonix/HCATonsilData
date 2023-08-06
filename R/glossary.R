@@ -131,7 +131,9 @@ library("htmltools")
 #' Defines in which form the information is returned, either as an individual page
 #' or simply as HTML code to directly embed into other documents.
 #'
-#' @return
+#' @return Either the HTML code generated to be embedded, or a standalone HTML
+#' page is created - and the location to this temp file is returned as a character
+#' (default).
 #' @export
 #'
 #' @importFrom htmltools tags
