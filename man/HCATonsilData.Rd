@@ -25,6 +25,9 @@ via \code{cell_type})
 The data was downloaded from Zenodo
 https://zenodo.org/record/6340174#.YkwQwX9BxH4
 }
+\examples{
+# TODO
+}
 \author{
 Ramon Massoni-Badosa
 }

@@ -25,6 +25,7 @@
 #' @importFrom SummarizedExperiment assay
 #'
 #' @examples
+#' # TODO
 HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts = TRUE) {
   # Sanity checks
   allowedAssays <- c("RNA", "ATAC", "CITE", "Spatial")
