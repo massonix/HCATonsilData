@@ -20,8 +20,8 @@
 #'
 #' @importFrom ExperimentHub ExperimentHub
 #' @importFrom HDF5Array HDF5Array
-#' @importFrom SingleCellExperiment SingleCellExperiment
-#' @importFrom SingleCellExperiment reducedDims
+#' @importFrom SingleCellExperiment SingleCellExperiment reducedDim reducedDim<-
+#' reducedDims
 #' @importFrom SummarizedExperiment assay
 #'
 #' @examples
