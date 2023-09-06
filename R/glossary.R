@@ -139,6 +139,7 @@ library("htmltools")
 #' @importFrom htmltools tags
 #' @importFrom utils browseURL read.table
 #' @importFrom rmarkdown render
+#' @importFrom base64enc dataURI
 #'
 #' @examples
 #' TonsilData_cellinfo_html("PDC")
@@ -146,7 +147,7 @@ library("htmltools")
 #' TonsilData_cellinfo_html("preT")
 #' TonsilData_cellinfo_html("preT", output_to = "html_to_embed")
 TonsilData_cellinfo_html <- function(cell_type = NULL,
-                                     display_plot = FALSE,
+                                     display_plot = TRUE,
                                      output_to = c("single_page", "html_to_embed")) {
 
 
