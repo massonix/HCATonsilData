@@ -23,7 +23,7 @@ test_that("downloading RNA data works", {
   expect_equal(dim(SingleCellExperiment::reducedDim(sce, "UMAP")), c(277, 2))
   expect_equal(dim(SingleCellExperiment::reducedDim(sce, "HARMONY")), c(277, 50))
   expect_equal(dim(SingleCellExperiment::rowData(sce)), c(37378, 3))
-  expect_equal(dim(SingleCellExperiment::colData(sce)), c(277, 30))
+  expect_equal(dim(SingleCellExperiment::colData(sce)), c(277, 31))
 
   # Test variables colData()
   vars <- c("barcode", "donor_id", "gem_id", "library_name", "assay", "sex",
@@ -69,4 +69,24 @@ test_that("Info retrieval", {
   )
   expect_type(info_sce, "character")
   expect_true(grepl(pattern = "277 cells", info_sce))
+})
+
+
+test_that("Updating annotations works", {
+  sce <- HCATonsilData(
+    assayType = "RNA",
+    cellType = "CD8-T",
+    processedCounts = FALSE
+  )
+  sce <- updateAnnotation(
+    sce = sce,
+    refAnnotation = "20220215",
+    newAnnotation = "20220619"
+  )
+  oldAnnot <- sce$annotation_20220215
+  newAnnot <- sce$annotation_20220619
+  expect_true(
+    all(colnames(sce)[oldAnnot == "CXCR6+ RM CD8 T"] ==
+        colnames(sce)[newAnnot == "RM CD8 activated T"])
+  )
 })

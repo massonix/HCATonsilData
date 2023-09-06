@@ -85,6 +85,32 @@ HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts =
   )
   SummarizedExperiment::assay(sce, "logcounts", withDimnames = FALSE) <- prccts
   }
+
+  # Update annotations
+  sce <- updateAnnotation(
+    sce = sce,
+    refAnnotation = "20220215",
+    newAnnotation = "20220619"
+  )
+
+  # We did some last minute changes to NBC-MBC before publication, let's
+  # reannotate and change the UMAP coords to map with the manuscript
+  if (cellType == "NBC-MBC") {
+    sce <- sce[, NBC_MBC_annotation_df$barcode]
+    sce$annotation_20220619 <- NBC_MBC_annotation_df$annotation_20220619
+    umap_df <- as.matrix(NBC_MBC_annotation_df[, c("UMAP_1", "UMAP_2")])
+    reducedDim(sce, "UMAP") <- umap_df
+  }
+
+  # Similarly, let us update NBC/MBC annotation in case cellType = All
+  if (cellType == "All") {
+    annot <- sce$annotation_20220619
+    names(annot) <- colnames(sce)
+    annot[NBC_MBC_annotation_df$barcode] <- NBC_MBC_annotation_df$annotation_20220619
+    sce$annotation_20220619 <- annot
+  }
+
+  # Return
   sce
 }
 
