@@ -25,6 +25,7 @@ Imports:
     SummarizedExperiment,
     htmltools,
     rmarkdown,
+    base64enc,
     utils
 Suggests: 
     knitr,
