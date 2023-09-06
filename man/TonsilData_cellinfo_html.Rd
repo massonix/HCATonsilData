@@ -6,7 +6,7 @@
 \usage{
 TonsilData_cellinfo_html(
   cell_type = NULL,
-  display_plot = FALSE,
+  display_plot = TRUE,
   output_to = c("single_page", "html_to_embed")
 )
 }

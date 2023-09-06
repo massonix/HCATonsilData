@@ -26,3 +26,6 @@ newer literature comes out, we expect annotations to be refined over time.
 We have accommodated this by allowing us and users to add newer annotations
 to the SingleCellExperiment objects.
 }
+\examples{
+# TODO
+}
