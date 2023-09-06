@@ -66,3 +66,14 @@ updateAnnotation <- function(sce,
   }
   sce
 }
+
+
+#' TODO
+#'
+#' TODO
+#'
+#' @details TODO
+#'
+#' @name NBC_MBC_annotation_df
+#' @docType data
+NULL
