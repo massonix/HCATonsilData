@@ -231,14 +231,35 @@ TonsilData_cellinfo_html <- function(cell_type = NULL,
 
       ## TODO:
       # handle the part with including the umap plot, specifically for that subset
+      if (display_plot) {
+        img_location <- glossary_df[cell_type, "umap_png"]
+        img_html <-
+          paste0(
+            tags$img(
+              src = base64enc::dataURI(
+                file = system.file("images", img_location, package = "HCATonsilData"),
+                mime = "image/png"
+              ),
+              width = 500
+            ),
+            tags$hr()
+          )
+      } else {
+        img_html <- ""
+      }
+
 
       cell_html <- paste0(
         cell_html_celltype,
+        img_html,
         cell_html_celldescription,
         cell_html_cellmarkers,
         cell_html_refs #,
         # cell_html_cellontology
       )
+
+
+
 
       if (output_to == "single_page") {
         # put this into a html file
