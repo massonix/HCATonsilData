@@ -17,6 +17,7 @@
 #' @export
 #'
 #' @examples
+#' # TODO
 updateAnnotation <- function(sce,
                              refAnnotation = "20220215",
                              newAnnotation = "20220619") {
@@ -65,3 +66,14 @@ updateAnnotation <- function(sce,
   }
   sce
 }
+
+
+#' TODO
+#'
+#' TODO
+#'
+#' @details TODO
+#'
+#' @name NBC_MBC_annotation_df
+#' @docType data
+NULL

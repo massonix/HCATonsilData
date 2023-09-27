@@ -17,15 +17,18 @@ Description: This package provides access to the scRNA-seq, scATAC-seq,
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 Imports: 
     ExperimentHub,
     SingleCellExperiment,
     HDF5Array,
-    SummarizedExperiment
+    SummarizedExperiment,
+    htmltools,
+    rmarkdown,
+    base64enc,
+    utils
 Suggests: 
     knitr,
-    rmarkdown,
     ggplot2,
     testthat (>= 3.0.0),
     iSEE,

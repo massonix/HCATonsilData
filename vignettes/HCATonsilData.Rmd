@@ -19,7 +19,8 @@ bibliography: HCATonsilData.bib
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
 ```
 
@@ -281,6 +282,26 @@ following code:
 # Explore data with iSEE
 
 Coming soon! (TODO)
+
+# Exploring information on the Tonsil Data Atlas
+
+Yadda yadda TODO, one can read up info on this in two different manners
+
+```{r eval = TRUE}
+library("HCATonsilData")
+
+head(TonsilData_glossary())
+
+TonsilData_cellinfo("Th17")
+```
+
+
+```{r eval = TRUE}
+htmltools::includeHTML(
+  TonsilData_cellinfo_html("Th17", display_plot = TRUE)
+)
+```
+
 
 # Session information
 

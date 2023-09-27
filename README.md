@@ -74,7 +74,7 @@ mainExpName: NULL
 altExpNames(0):
 ```
 
-![](inst/images/CD4_T_UMAP.png)
+![](inst/images/CD4_T_UMAP_readme.png)
 
 # Requirements
 
