@@ -17,7 +17,8 @@
 #' @export
 #'
 #' @examples
-#' # TODO
+#' # TODO - Ramon
+#' NULL
 updateAnnotation <- function(sce,
                              refAnnotation = "20220215",
                              newAnnotation = "20220619") {
@@ -74,6 +75,10 @@ updateAnnotation <- function(sce,
 #'
 #' @details TODO
 #'
+#' @return TODO
+#'
 #' @name NBC_MBC_annotation_df
 #' @docType data
 NULL
+
+globalVariables("NBC_MBC_annotation_df")
