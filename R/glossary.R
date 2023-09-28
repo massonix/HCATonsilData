@@ -8,6 +8,7 @@
 #'
 #' @examples
 #' glossary_df <- TonsilData_glossary()
+#' head(glossary_df)
 TonsilData_glossary <- function() {
   glossary_location <- system.file("extdata", "sloglo_tabular.csv", package = "HCATonsilData")
 
