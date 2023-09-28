@@ -15,4 +15,5 @@ Convenience function to read directly in the file provided as \code{extdata}
 }
 \examples{
 glossary_df <- TonsilData_glossary()
+head(glossary_df)
 }
