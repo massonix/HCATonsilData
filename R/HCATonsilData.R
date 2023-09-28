@@ -25,7 +25,12 @@
 #' @importFrom SummarizedExperiment assay
 #'
 #' @examples
-#' # TODO
+#' # retrieve the epithelial scRNA-seq dataset
+#' sce_epithelial <- HCATonsilData(
+#'   assayType = "RNA",
+#'   cellType = "epithelial"
+#' )
+#' sce_epithelial
 HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts = TRUE) {
   # Sanity checks
   allowedAssays <- c("RNA", "ATAC", "CITE", "Spatial")
