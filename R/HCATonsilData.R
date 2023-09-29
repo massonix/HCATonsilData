@@ -25,7 +25,12 @@
 #' @importFrom SummarizedExperiment assay
 #'
 #' @examples
-#' # TODO
+#' # retrieve the epithelial scRNA-seq dataset
+#' sce_epithelial <- HCATonsilData(
+#'   assayType = "RNA",
+#'   cellType = "epithelial"
+#' )
+#' sce_epithelial
 HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts = TRUE) {
   # Sanity checks
   allowedAssays <- c("RNA", "ATAC", "CITE", "Spatial")
@@ -96,9 +101,9 @@ HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts =
   # We did some last minute changes to NBC-MBC before publication, let's
   # reannotate and change the UMAP coords to map with the manuscript
   if (cellType == "NBC-MBC") {
-    sce <- sce[, HCATonsilData::NBC_MBC_annotation_df$barcode]
-    sce$annotation_20220619 <- HCATonsilData::NBC_MBC_annotation_df$annotation_20220619
-    umap_df <- as.matrix(HCATonsilData::NBC_MBC_annotation_df[, c("UMAP_1", "UMAP_2")])
+    sce <- sce[, NBC_MBC_annotation_df$barcode]
+    sce$annotation_20220619 <- NBC_MBC_annotation_df$annotation_20220619
+    umap_df <- as.matrix(NBC_MBC_annotation_df[, c("UMAP_1", "UMAP_2")])
     reducedDim(sce, "UMAP") <- umap_df
   }
 
@@ -106,7 +111,7 @@ HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts =
   if (cellType == "All") {
     annot <- sce$annotation_20220619
     names(annot) <- colnames(sce)
-    annot[HCATonsilData::NBC_MBC_annotation_df$barcode] <- HCATonsilData::NBC_MBC_annotation_df$annotation_20220619
+    annot[NBC_MBC_annotation_df$barcode] <- NBC_MBC_annotation_df$annotation_20220619
     sce$annotation_20220619 <- annot
   }
 

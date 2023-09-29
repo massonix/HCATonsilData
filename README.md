@@ -91,3 +91,8 @@ objects. If you want to contribute in one of these versions of the upcoming anno
 please [open an issue](https://github.com/massonix/HCATonsilData/issues/new) and describe your annotation.
 
 TODO: include glossary
+
+# Reference
+
+TODO some ref to the original publication, https://doi.org/10.1101/2022.06.24.497299 
+TODO replace it once the manuscript is out

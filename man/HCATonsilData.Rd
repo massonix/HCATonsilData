@@ -26,7 +26,12 @@ The data was downloaded from Zenodo
 https://zenodo.org/record/6340174#.YkwQwX9BxH4
 }
 \examples{
-# TODO
+# retrieve the epithelial scRNA-seq dataset
+sce_epithelial <- HCATonsilData(
+  assayType = "RNA",
+  cellType = "epithelial"
+)
+sce_epithelial
 }
 \author{
 Ramon Massoni-Badosa

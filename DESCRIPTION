@@ -1,19 +1,21 @@
 Package: HCATonsilData
 Title: Provide programmatic access to the tonsil cell atlas datasets 
-Version: 0.0.0.9000
+Version: 0.98.0
 Authors@R: c(person("Ramon", "Massoni-Badosa", role = c("aut", "cre"),
-                   email="ramon.massoni@cnag.crg.eu"),
-            person("Federico", "Marini", role = c("aut"),
-                   email = "marinif@uni-mainz.de", 
-                   comment = c(ORCID = "0000-0003-3252-7758")),
-            person("Alan", "O'Callaghan", role = c("aut"),
-                   email = "alan.ocallaghan@outlook.com")
-          )
+                    email="ramon.massoni@cnag.crg.eu",
+                    comment = c(ORCID = "0000-0001-7115-8145")),
+             person("Federico", "Marini", role = c("aut"),
+                    email = "marinif@uni-mainz.de", 
+                    comment = c(ORCID = "0000-0003-3252-7758")),
+             person("Alan", "O'Callaghan", role = c("aut"),
+                    email = "alan.ocallaghan@outlook.com")
+           )
 Description: This package provides access to the scRNA-seq, scATAC-seq,
     multiome, CITE-seq and spatial transcriptomics (Visium) data generated
     by the tonsil cell atlas in the context of the Human Cell Atlas (HCA).
     The data is provided via the Bioconductor project in the form of 
-    SingleCellExperiments.
+    SingleCellExperiments. Additionally, information on the whole compendium of
+    identified cell types is provided in form of a glossary.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -37,7 +39,6 @@ Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://github.com/massonix/HCATonsilData
 BugReports: https://github.com/massonix/HCATonsilData/issues
-biocViews: SingleCellData, ExperimentData, RNASeqData, ExperimentHub
+biocViews: SingleCellData, ExperimentData, RNASeqData, ExperimentHub, SpatialData
 Depends: 
-    R (>= 2.10)
-LazyData: true
+    R (>= 4.3.0)

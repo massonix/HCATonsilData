@@ -8,6 +8,7 @@
 #'
 #' @examples
 #' glossary_df <- TonsilData_glossary()
+#' head(glossary_df)
 TonsilData_glossary <- function() {
   glossary_location <- system.file("extdata", "sloglo_tabular.csv", package = "HCATonsilData")
 
@@ -62,9 +63,7 @@ TonsilData_cellinfo <- function(cell_type = NULL) {
         # "\nCell Ontology terms: ",
         # glossary_df[matched_celltype, "related_cellontology"]
       )
-
       message(cell_msg)
-
 
     } else {
       message("Cell type not found! Please select one of the following: ",
@@ -76,10 +75,7 @@ TonsilData_cellinfo <- function(cell_type = NULL) {
 }
 
 
-
 .actionbutton_biocstyle <- "color: #ffffff; background-color: #0092AC"
-
-library("htmltools")
 
 .link_marker <- function(gene_id) {
   sprintf(
@@ -113,13 +109,6 @@ library("htmltools")
   )
 }
 
-
-
-
-
-
-
-
 #' TonsilData_cellinfo_html
 #'
 #' @param cell_type String character, used to define the cell type for which the
@@ -149,7 +138,6 @@ library("htmltools")
 TonsilData_cellinfo_html <- function(cell_type = NULL,
                                      display_plot = TRUE,
                                      output_to = c("single_page", "html_to_embed")) {
-
 
   output_to <- match.arg(output_to, c("single_page", "html_to_embed"))
 
@@ -192,7 +180,6 @@ TonsilData_cellinfo_html <- function(cell_type = NULL,
         tags$br()
       )
 
-
       refs <- as.character(glossary_df[cell_type, "related_refs"])
       refs_split <- unlist(strsplit(refs, split = ";", fixed = TRUE))
       refs_split_names <- unlist(lapply(
@@ -216,7 +203,6 @@ TonsilData_cellinfo_html <- function(cell_type = NULL,
         tags$br(),
         tags$br()
       )
-
 
       # cellonts <- as.character(glossary_df[cell_type, "related_cellontology"])
       # cellonts_split <- unlist(strsplit(cellonts, split = ",", fixed = TRUE))
@@ -249,7 +235,6 @@ TonsilData_cellinfo_html <- function(cell_type = NULL,
         img_html <- ""
       }
 
-
       cell_html <- paste0(
         cell_html_celltype,
         img_html,
@@ -258,9 +243,6 @@ TonsilData_cellinfo_html <- function(cell_type = NULL,
         cell_html_refs #,
         # cell_html_cellontology
       )
-
-
-
 
       if (output_to == "single_page") {
         # put this into a html file
@@ -274,7 +256,6 @@ TonsilData_cellinfo_html <- function(cell_type = NULL,
       } else if (output_to == "html_to_embed") {
         return(cell_html)
       }
-
 
     } else {
       message("Cell type not found! Please select one of the following: ",

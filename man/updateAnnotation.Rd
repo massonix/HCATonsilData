@@ -27,5 +27,6 @@ We have accommodated this by allowing us and users to add newer annotations
 to the SingleCellExperiment objects.
 }
 \examples{
-# TODO
+# TODO - Ramon
+NULL
 }
