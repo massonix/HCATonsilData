@@ -74,6 +74,6 @@ if (all(str_remove(out_df$RDataPath, "HCATonsilData/2.0/RNA/") %in% slots)) {
 # Write
 write_delim(
   out_df,
-  file = here("inst/extdata/metadata-tonsil-atlas-rnal-v2.csv"),
+  file = here("inst/extdata/metadata-tonsil-atlas-rna-v2.csv"),
   delim = ","
 )
