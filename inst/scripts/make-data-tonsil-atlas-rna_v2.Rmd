@@ -96,7 +96,6 @@ untar(out_file, exdir = data_dir)
 
 ```{r}
 # Get gene information
-names(files_seurat) <- str_extract(files_seurat, "20220215_\\.*_seurat")
 genes_df <- read_tsv(
   here("inst/extdata/features.tsv.gz"),
   col_names = c("ensembl_id", "symbol", "type")

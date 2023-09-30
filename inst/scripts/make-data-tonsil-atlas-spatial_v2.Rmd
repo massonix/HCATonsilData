@@ -30,6 +30,9 @@ library(Seurat)
 library(HDF5Array)
 library(stringr)
 library(SpatialExperiment)
+library(tools)
+library(dplyr)
+library(readr)
 ```
 
 
@@ -87,25 +90,18 @@ untar(out_file, exdir = data_dir)
 ```
 
 
+# Process Seurat objects to extract relevant slots
 
-```{r dirs}
-dir <- file.path("inst", "scripts")
-dat_dir <- file.path(dir, "visium_raw_data")
-out_dir <- file.path(dir, "HCATonsilData/2.0/Visium")
-dir.create(dat_dir, recursive=TRUE, showWarnings=FALSE)
-dir.create(out_dir, recursive=TRUE, showWarnings=FALSE)
-```
+```{r}
+# Read data
+file_path <- here("inst/scripts/spatial_raw_data/spatial_transcriptomics/20220527_tonsil_atlas_spatial_seurat_obj.rds")
+so <- readRDS(file_path)
 
-```{r load}
-fnm <- "20220527_tonsil_atlas_spatial_seurat_obj.rds"
-so <- readRDS(file.path(dat_dir, fnm))
-```
 
-```{r save}
 # 'assays'
 for (i in c("counts", "data")) {
     j <- switch(i, counts="counts", data="logcounts")
-    fnm <- file.path(out_dir, glue("assay_{j}.h5"))
+    fnm <- file.path(out_dir, glue("Spatial_assay_{j}.h5"))
     mtx <- GetAssayData(so, i)
     h5 <- writeHDF5Array(mtx, 
         filepath=fnm, name=j, 
@@ -116,39 +112,56 @@ for (i in c("counts", "data")) {
 for (dr in Reductions(so)) {
     obj <- Embeddings(so, dr)
     rownames(obj) <- NULL
-    fnm <- file.path(out_dir, glue("dimred_{dr}.rds"))
+    fnm <- file.path(out_dir, glue("Spatial_dimred_{dr}.rds"))
     saveRDS(obj, fnm)
 }
+
 
 # 'colData'
 cd <- DataFrame(so@meta.data)
 cd$sample_id <- cd$gem_id # needed for SPE
-saveRDS(cd, file.path(out_dir, "coldata.rds"))
+saveRDS(cd, file.path(out_dir, "Spatial_coldata.rds"))
+
 
 # 'rowData'
+genes_df <- read_tsv(
+  here("inst/extdata/features.tsv.gz"),
+  col_names = c("ensembl_id", "symbol", "type")
+) %>%
+  filter(type == "Gene Expression") %>%
+  as.data.frame()
+gene_ids <- genes_df$ensembl_id
+names(gene_ids) <- genes_df$symbol
 gs <- rownames(so)
 rd <- so[["Spatial"]]@meta.features
-rd <- DataFrame(row.names=gs, gene_name=gs, rd) # 'gene_id's?
+rd <- DataFrame(row.names=gs, gene_name=gs, rd)
+rd$gene_id <- gene_ids[rd$gene_name]
+names(rd$gene_id) <- NULL
 rd$highly_variable <- gs %in% VariableFeatures(so)
-saveRDS(rd, file.path(out_dir, "rowdata.rds"))
+saveRDS(rd, file.path(out_dir, "Spatial_rowdata.rds"))
 
 # 'imgData'
 id <- lapply(Images(so), \(id) {
     sfs <- so@images[[id]]@scale.factors
     img <- GetImage(so, image=id, mode="raster")
-    saveRDS(img, file.path(out_dir, glue("image_{id}.rds")))
-    saveRDS(sfs, file.path(out_dir, glue("scale_{id}.rds")))
+    saveRDS(img, file.path(out_dir, glue("Spatial_image_{id}.rds")))
+    saveRDS(sfs, file.path(out_dir, glue("Spatial_scale_{id}.rds")))
 })
 ```
 
+
+# Sanity checks
+
+As a sanity check, let us ensure that we can create successfully each SingleCellExperiment object from its individual slots:
+
 ```{r load}
 # metadata
-rd <- readRDS(file.path(out_dir, "rowdata.rds"))
-cd <- readRDS(file.path(out_dir, "coldata.rds"))
+rd <- readRDS(file.path(out_dir, "Spatial_rowdata.rds"))
+cd <- readRDS(file.path(out_dir, "Spatial_coldata.rds"))
 
 # assays
-as <- list.files(out_dir, "^assay_", full.names=TRUE)
-names(as) <- gsub("^assay_(.*)\\.h5$", "\\1", basename(as))
+as <- list.files(out_dir, "^Spatial_assay_", full.names=TRUE)
+names(as) <- gsub("^Spatial_assay_(.*)\\.h5$", "\\1", basename(as))
 as <- mapply(
     \(h5, nm) {
         mtx <- h5read(h5, name=nm)
@@ -159,20 +172,22 @@ as <- mapply(
     h5=as, nm=names(as), SIMPLIFY=FALSE)
 
 # reductions
-dr <- list.files(out_dir, "^dimred_", full.names=TRUE)
-names(dr) <- toupper(gsub("^dimred_(.*)\\.rds", "\\1", basename(dr)))
+dr <- list.files(out_dir, "^Spatial_dimred_", full.names=TRUE)
+names(dr) <- toupper(gsub("^Spatial_dimred_(.*)\\.rds", "\\1", basename(dr)))
 dr <- lapply(dr, readRDS)
 
 # images
 id <- lapply(unique(cd$sample_id), \(id) {
-    img <- readRDS(file.path(out_dir, glue("image_{id}.rds")))
-    sfs <- readRDS(file.path(out_dir, glue("scale_{id}.rds")))
+    img <- readRDS(file.path(out_dir, glue("Spatial_image_{id}.rds")))
+    sfs <- readRDS(file.path(out_dir, glue("Spatial_scale_{id}.rds")))
     DataFrame(
         sample_id=id, image_id="lowres",
         data=I(list(SpatialImage(img))), 
         scaleFactor=sfs$lowres)
 }) |> do.call(what="rbind")
 ```
+
+Construct SpatialExperiment object:
 
 ```{r spe}
 # construct 'SpatialExperiment'
@@ -202,6 +217,7 @@ elementMetadata(rowRanges(sce_old)) <- elementMetadata(rowRanges(sce_new))
 # check saved & re-loaded objects match
 identical(sce_old, sce_new)
 ```
+
 
 # Session Information
 
