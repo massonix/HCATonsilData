@@ -192,7 +192,7 @@ As a sanity check, let us ensure that we can create successfully each SingleCell
 
 ```{r}
 all_files <- list.files(out_dir, full.names = TRUE)
-for (cell_type in files_df$cell_type) {
+for (cell_type in cell_types) {
   print(cell_type)
   path_to_cts <- str_subset(all_files, glue("{cell_type}.*counts.h5"))
   path_to_processed <- str_subset(all_files, glue("{cell_type}.*processed.h5"))
@@ -207,6 +207,7 @@ for (cell_type in files_df$cell_type) {
   col_data <- readRDS(path_to_coldata)
   pca <- readRDS(path_to_pca)
   umap <- readRDS(path_to_umap)
+  harmony <- readRDS(path_to_harmony)
   sce <- SingleCellExperiment::SingleCellExperiment(
     assays = list(counts = counts, logcounts = processed),
     colData = col_data,
@@ -214,14 +215,11 @@ for (cell_type in files_df$cell_type) {
   )
   SingleCellExperiment::reducedDims(sce) <- list(
     PCA = pca,
-    UMAP = umap
+    UMAP = umap,
+    HARMONY = harmony
   )
-  if (length(path_to_harmony) == 1) {
-    harmony <- readRDS(path_to_harmony)
-    SingleCellExperiment::reducedDim(sce, "HARMONY") <- harmony
-  }
   print(sce)
-  print(scater::plotUMAP(sce, colour_by = "annotation_20220215"))
+  #print(scater::plotUMAP(sce, colour_by = "annotation_20220215"))
   if (class(sce) != "SingleCellExperiment") {
     stop(glue("The output of {cell_type} is not a SingleCellExperiment!"))
   }
