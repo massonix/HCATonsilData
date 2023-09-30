@@ -33,55 +33,32 @@ rdclass <- c(counts = "H5File", logcounts = "H5File", coldata = "DFrame",
              rowdata = "DFrame", pca = "matrix", harmony = "matrix",
              umap = "matrix")
 names(slots_no_image) <- slots_names
-metadata_df <- data.frame(
+metadata_df1 <- data.frame(
   Title = glue("Tonsil Atlas Visium data {titles[slots_names]}"),
   Description = glue("{descs[slots_names]} for the Tonsil Cell Atlas Visium dataset"),
   RDataPath = glue("HCATonsilData/2.0/Spatial/{slots_no_image[slots_names]}"),
-  BiocVersion = "3.18",
-  Genome = "GRCh38",
-  SourceType = "HDF5",
-  SourceUrl = "https://zenodo.org/record/8373756",
-  SourceVersion = "2.0",
-  Species = "Homo sapiens",
-  TaxonomyId = "9606",
-  Coordinate_1_based = NA,
-  DataProvider = "BCLL@las",
-  Maintainer = "Ramon Massoni-Badosa <ramonmassoni@gmail.com>",
   RDataClass = rdclass[slots_names],
   DispatchClass = ifelse(rdclass[slots_names] == "H5File", "H5File", "Rds")
 )
 
 
-#
-    RDataPath = glue("HCATonsilData/2.0/RNA/{cell_type}_{dataset}_{outs}{suffix}"),
+# Handle images and scales
+slots_image <- str_subset(slots, "(image|scale)")
+sample_ids <- slots_image %>%
+  str_remove("(Spatial_image_|Spatial_scale_)") %>%
+  str_remove(".rds")
+file_type <- str_extract(slots_image, "(scale|image)")
+file_type[file_type == "image"] <- "H&E staining"
+metadata_df2 <- data.frame(
+  Title = glue("Tonsil Atlas Visium {file_type} ({sample_ids})"),
+  Description = glue("{file_type} for sample {sample_ids}"),
+  RDataPath = glue("HCATonsilData/2.0/Spatial/{slots_image}"),
+  RDataClass = ifelse(file_type == "scale", "scalefactors", "raster"),
+  DispatchClass = "Rds"
 )
-
-
-
-
-convs <- c(coldata = "colData", counts = "counts", processed = "processed counts",
-           rowdata = "rowData", pca = "PCA", harmony = "HARMONY", umap = "UMAP")
-convs2 <- c(coldata = "Cell metadata", counts = "Count matrix",
-            processed = "Processed count matrix", rowdata = "Gene annotation",
-            pca = "PCA representation", harmony = "HARMONY representation",
-            umap = "UMAP representation")
-suffix <- c(coldata = ".rds", counts = ".h5", processed = ".h5", rowdata = ".rds",
-            pca = ".rds", harmony = ".rds", umap = ".rds")
-rdclass <- c(coldata = "DFrame", counts = "H5File", processed = "H5File",
-             rowdata = "DFrame", pca = "matrix", harmony = "matrix", umap = "matrix")
-out_df <- files_df %>%
-  mutate(outs = "coldata;counts;processed;rowdata;pca;harmony;umap") %>%
-  separate_rows(outs, sep = ";") %>%
+metadata_df <- bind_rows(metadata_df1, metadata_df2)
+metadata_df <- metadata_df %>%
   mutate(
-    outs2 = convs[outs],
-    descs = convs2[outs],
-    suffix = suffix[outs]
-  ) %>%
-  mutate(cell_type = str_replace(cell_type, "(/| )", "_")) %>%
-  mutate(
-    Title = glue("Tonsil Atlas RNA {cell_type} {outs2}"),
-    Description = glue("{descs} for the Tonsil Cell Atlas {cell_type} scRNA-seq/Multiome dataset"),
-    RDataPath = glue("HCATonsilData/2.0/RNA/{cell_type}_{dataset}_{outs}{suffix}"),
     BiocVersion = "3.18",
     Genome = "GRCh38",
     SourceType = "HDF5",
@@ -91,24 +68,18 @@ out_df <- files_df %>%
     TaxonomyId = "9606",
     Coordinate_1_based = NA,
     DataProvider = "BCLL@las",
-    Maintainer = "Ramon Massoni-Badosa <ramonmassoni@gmail.com>",
-    RDataClass = rdclass[outs],
-    DispatchClass = ifelse(suffix == ".h5", "H5File", "Rds")
-  ) %>%
+    Maintainer = "Ramon Massoni-Badosa <ramonmassoni@gmail.com>"
+) %>%
   select(Title, Description, RDataPath, BiocVersion, Genome,
          SourceType, SourceUrl, SourceVersion, Species, TaxonomyId,
          Coordinate_1_based, DataProvider, Maintainer, RDataClass,
          DispatchClass)
-
-
-# Check that all files exist
-files <- file.path("HCATonsilData", list.files(path_to_data, recursive = TRUE))
-out_df <- out_df[out_df$RDataPath %in% files, ]
+rownames(metadata_df) <- NULL
 
 
 # Write
 write_delim(
-  out_df,
-  file = here("inst/extdata/metadata-tonsil-atlas-rna.csv"),
+  metadata_df,
+  file = here("inst/extdata/metadata-tonsil-atlas-spatial_v2.csv"),
   delim = ","
 )
