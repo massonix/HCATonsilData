@@ -18,7 +18,7 @@ options(width = 100)
 
 # Introduction
 
-Here we will download and process the version 2 of the [Seurat](https://zenodo.org/record/8373756) objects associated with the single-cell transcriptomes of the tonsil cell atlas to prepare them for submission to [`ExperimentHub`](https://bioconductor.org/packages/release/bioc/html/ExperimentHub.html). We will follow a similar style and structure as the one used for the [`TabulaMurisSenisData`](https://github.com/fmicompbio/TabulaMurisSenisData) pacakge.
+Here we will download and process the version 2 of the [Seurat](https://zenodo.org/record/8373756) objects associated with the single-cell transcriptomes of the tonsil cell atlas to prepare them for submission to [`ExperimentHub`](https://bioconductor.org/packages/release/bioc/html/ExperimentHub.html). We will follow a similar style and structure as the one used for the [`TabulaMurisSenisData`](https://github.com/fmicompbio/TabulaMurisSenisData) package.
 
 
 
