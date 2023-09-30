@@ -70,7 +70,7 @@ dir.create(out_dir, recursive = TRUE, showWarnings = TRUE)
 
 
 # Get URL and download
-options(timeout = 1000000)
+options(timeout = 10000000)
 rna_url <- files_df[str_detect(files_df$file_name, "RNA"), "url"]
 out_file <- file.path(
   data_dir,
