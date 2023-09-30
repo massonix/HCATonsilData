@@ -12,10 +12,13 @@ library(glue)
 
 
 # Read data
-path_to_csv <- here("inst/scripts/tonsil-atlas-rds-files.csv")
-path_to_data <- here("inst/scripts/HCATonsilData")
-files_df <- read.csv(file = path_to_csv, header = TRUE)
-files_df <- files_df[files_df$dataset == "RNA", ]
+data_dir <- here("inst/scripts/HCATonsilData/2.0/RNA")
+slots <- list.files(data_dir)
+cell_types <- slots %>%
+  str_split("_") %>%
+  map_chr(1) %>%
+  unique()
+df <- data.frame(cell_type = cell_types)
 
 
 # Generate metadata file for ExperimentHub package
@@ -29,7 +32,7 @@ suffix <- c(coldata = ".rds", counts = ".h5", processed = ".h5", rowdata = ".rds
             pca = ".rds", harmony = ".rds", umap = ".rds")
 rdclass <- c(coldata = "DFrame", counts = "H5File", processed = "H5File",
              rowdata = "DFrame", pca = "matrix", harmony = "matrix", umap = "matrix")
-out_df <- files_df %>%
+out_df <- df %>%
   mutate(outs = "coldata;counts;processed;rowdata;pca;harmony;umap") %>%
   separate_rows(outs, sep = ";") %>%
   mutate(
@@ -59,17 +62,18 @@ out_df <- files_df %>%
          SourceType, SourceUrl, SourceVersion, Species, TaxonomyId,
          Coordinate_1_based, DataProvider, Maintainer, RDataClass,
          DispatchClass)
-dir.create(here("inst/extdata"))
-
 
 # Check that all files exist
-files <- file.path("HCATonsilData", list.files(path_to_data, recursive = TRUE))
-out_df <- out_df[out_df$RDataPath %in% files, ]
+if (all(str_remove(out_df$RDataPath, "HCATonsilData/2.0/RNA/") %in% slots)) {
+  print("All files exist and are ready to be uploaded")
+} else {
+  print("Missing files!")
+}
 
 
 # Write
 write_delim(
   out_df,
-  file = here("inst/extdata/metadata-tonsil-atlas-rna.csv"),
+  file = here("inst/extdata/metadata-tonsil-atlas-rnal-v2.csv"),
   delim = ","
 )

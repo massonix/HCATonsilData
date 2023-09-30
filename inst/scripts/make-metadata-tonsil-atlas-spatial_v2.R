@@ -80,6 +80,6 @@ rownames(metadata_df) <- NULL
 # Write
 write_delim(
   metadata_df,
-  file = here("inst/extdata/metadata-tonsil-atlas-spatial_v2.csv"),
+  file = here("inst/extdata/metadata-tonsil-atlas-spatial-v2.csv"),
   delim = ","
 )
