@@ -109,6 +109,17 @@ knitr::include_graphics("tonsil_atlas_cohort.png")
 ```
 
 
+For each data modality, we mapped all raw fastq files with the appropriate flavor
+of [cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger)
+(e.g. cellranger-atac, spaceranger, etc), and analyzed all datasets within the
+[Seurat](https://satijalab.org/seurat/) ecosystem [@hao2021integrated]. All
+fastq files are deposited at EGA under accession number [EGAS00001006375](https://ega-archive.org/studies/EGAS00001006375).
+The expression and accessibility matrices are deposited in Zenodo under record [6678331](https://zenodo.org/record/6678331).
+The Seurat objects from which the data of this repository is derived are archived in Zenodo under record [8373756](https://zenodo.org/record/8373756).
+Finally, the GitHub repository [Single-Cell-Genomics-Group-CNAG-CRG/TonsilAtlas](https://github.com/Single-Cell-Genomics-Group-CNAG-CRG/TonsilAtlas) documents the full
+end-to-end analysis, from raw data to final Seurat objects and figures in the paper.
+
+
 The following UMAPs inform about the main cell populations and number of cells
 per assay:
 
@@ -118,7 +129,7 @@ knitr::include_graphics("tonsil_atlas_umaps.png")
 
 
 The dataset was originally analyzed with [Seurat](https://satijalab.org/seurat/).
-[@hao2021integrated] Important links:
+ Important links:
 
 * [Github repository with the full set of Rmd notebooks needed to go from raw expression matrices to the final objects](TODO add link).
 * [Zenodo repository where we deposited the Seurat objects](https://zenodo.org/record/6340174/#.Yl7BH39BxH4).
