@@ -92,8 +92,6 @@ kable(
 ```
 
 
-
-
 Here's a more detailed explanation of the different
 types of assay:
 
@@ -103,8 +101,8 @@ types of assay:
 * [CITE-seq](https://www.nature.com/articles/nmeth.4380): joint transcriptome + ~200 protein surface markers for each cell.
 * [Spatial transcriptomics]([10X Visium](https://www.10xgenomics.com/products/spatial-gene-expression))
 
-The following heatmap informs about which samples where sequenced with which
-technology:
+The following heatmap informs about which samples were sequenced with which
+technology and cohort type:
 
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics("tonsil_atlas_cohort.png")
