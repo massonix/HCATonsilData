@@ -12,7 +12,7 @@ vignette: >
   %\VignetteKeywords{GeneExpression, RNASeq, SingleCell, ATACSeq, Spatial, CITESeq}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 bibliography: HCATonsilData.bib
 ---
 
@@ -59,27 +59,42 @@ explains in detail the cell- and sample-level metadata, and allows users to
 traceback the annotation of each cell type through an interactive Glossary.
 
 
-# Installation
+# Getting Started
 
-```{r eval=FALSE}
-devtools::install_github("massonix/HCATonsilData", build_vignettes = TRUE) # TODO: 
-```
-
-Once we have installed the package, we can load it:
+Load the packages in R
 
 ```{r message=FALSE}
 library(HCATonsilData)
 library(SingleCellExperiment)
 library(ExperimentHub)
 library(ggplot2)
+library(knitr)
+library(kableExtra)
 ```
 
 
 # Overview of the dataset
 
-We obtained a total of ten human tonsils. These tonsils covered
-three age groups: kids (n=6, 3-5 years), young adults (n=3, 26-35 years) and
-old adults (n=1, 65 years). Here's a more detailed explanation of the different
+We obtained a total of 17 human tonsils, which covered three age groups:
+children (n=6, 3-5 years), young adults (n=8, 19-35 years) and old adults
+(n=3, 56-65 years). We collected them in a discovery cohort (n=10), which we
+used to cluster and annotate cell types; and a validation cohort (n=7), 
+which we used to validate the presence, annotation and markers of the discovered
+cell types. The following table corresponds to the donor-level metadata:
+
+```{r}
+kable(
+  donor_metadata,
+  format = "markdown",
+  caption = "Donor Metadata",
+  align = "c"
+) %>% kable_styling(full_width = FALSE)
+```
+
+
+
+
+Here's a more detailed explanation of the different
 types of assay:
 
 * scRNA-seq ([10X Chromium v3](https://www.10xgenomics.com/products/single-cell-gene-expression))
