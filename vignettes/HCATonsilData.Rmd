@@ -265,24 +265,31 @@ Here's a brief explanation of all the variables in the colData slot of the
 
 
 * barcode: the cell barcode. Combination of [GEM well](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/glossary) and cellranger 10X barcode.
-* donor_id
-* gem_id: we gave a unique hashtag to each GEM well (10X Chip Channel) in our dataset. This allows to traceback all the metadata for a given cell.       
-* library_name: each GEM well can give rise to multiple Illumina libraries (example: multiome, cell hashing, etc.).
+* donor_id: the donor-specific identifier, which can be used to retrieve donor-level metadata form the table above.
+* gem_id: we gave a unique hashtag to each [GEM well](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/glossary) (10X Chip Channel) in our dataset. This allows to traceback all the metadata for a given cell.       
+* library_name: each GEM well can give rise to multiple Illumina libraries. For example, one Multiome GEM well will give rise to 2 illumina libraries (ATAC and RNA).
 * assay: 3P (scRNA-seq) or multiome
 * sex
 * age
 * age_group: kid, young adult, old adult
-* hospital: hospital where the tonsils where obtained [Hospital Clinic](https://www.clinicbarcelona.org/) or [CIMA](https://cima.cun.es/).
-* UMAP_1_level_1, UMAP_2_level_1: UMAP1 coordinates of the figure 1b of our manuscript
+* hospital: hospital where the tonsils where obtained [Hospital Clinic](https://www.clinicbarcelona.org/), [CIMA](https://cima.cun.es/), or Newcastle.
+* cohort_type: discovery or validation cohort
+* cause_for_tonsillectomy: condition that led to the tonsillectomy (e.g. tonsillitis, sleep apnea, etc.)
+* is_hashed: whether we used [cell hashing](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-018-1603-1) or not.
+* preservation: whether we processed the sample fresh or frozen.
 * nCount_RNA, nFeature_RNA: number of counts and features (genes) detected per cell.
 * pct_mt, pct_ribosomal: percentage of counts that map to mitochondrial (^MT) or ribosomal (^RPS) genes.
-* is_hashed: whether we used [cell hashing](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-018-1603-1) or not.
 * pDNN_hashing, pDNN_scrublet, pDNN_union: proportion of doublet nearest neighbors (pDNN) using different doublet annotations.
-* scrublet_doublet_scores
-* scrublet_predicted_doublet
 * S.Score, G2M.Score Phase, CC.Difference: outputs of the [CellCycleScoring](https://rdrr.io/cran/Seurat/man/CellCycleScoring.html) from `Seurat`.
-* annotation_level_1: annotation used at our level 1 clustering (see above).
+* scrublet_doublet_scores: doublet score obtained with [Scrublet](https://www.cell.com/cell-systems/fulltext/S2405-4712(18)30474-5?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS2405471218304745%3Fshowall%3Dtrue)
+* scrublet_predicted_doublet: doublet annotation obtained with Scirpy (doublet or singlet)
+* doublet_score_scDblFinder: doublet score obtained with [scDblFinder](https://f1000research.com/articles/10-979), which was run in the validation cohort following [the most recent best practices for single-cell analysis](https://www.nature.com/articles/s41576-023-00586-w).
+* annotation_level_1: annotation used at our level 1 clustering (9 main compartments).
+* annotation_level_1_probability: annotation confidence for the level 1 annotation (relevant for validation cohort, as it implied KNN annotation)
 * annotation_figure_1: annotation used in the figure 1 of our manuscript. This annotation consisted of grouping the final subtypes into main cell types that were distinguishable in the UMAP.
+* annotation_20220215, annotation_20220619, annotation_20230508: time-stampled annotation for cell types.
+* annotation_20230508_probability: annotation confidence for the final annotation (relevant for validation cohort, as it implied KNN annotation)
+* UMAP_1_level_1, UMAP_2_level_1: UMAP1 coordinates of the figure 1B of the article.
 * annotation_20220215: see above.
 * UMAP_1_20220215, UMAP_2_20220215: UMAP coordinates used in figures of the preprint for each cell type.
 
@@ -372,14 +379,33 @@ the meaning of the variables that are specific to Multiome or scATAC-seq:
 * ATAC.weight: the weight that RNA has in the weighted nearest neihbor graph per cell (multiome-specific)
 
 
-
 ## CITE-seq
 
-Coming soon! (TODO) For now you can download the original `Seurat` object with the
-following code:
+The CITE-seq object can be downloaded as follows:
 
-```{r}
-#code to download specific CITE seq from zenodo
+```{r eval=FALSE}
+library(Seurat)
+dir.create("download_dir")
+options(timeout = 10000000)
+cite_url <- "https://zenodo.org/record/8373756/files/TonsilAtlasSeuratCITE.tar.gz"
+download.file(url = cite_url, destfile = "download_dir/TonsilAtlasSeuratCITE.tar.gz")
+# Advice: check that the md5sum is the same as the one in Zenodo
+untar("download_dir/TonsilAtlasSeuratCITE.tar.gz", exdir = "download_dir")
+cite <- readRDS("download_dir/CITE-seq/20220215_tonsil_atlas_cite_seurat_obj.rds")
+cite
+```
+
+
+Together with CITE-seq, we also applied scBCR-seq and scTCR-seq. This data was
+analyzed with [scirpy](https://academic.oup.com/bioinformatics/article/36/18/4817/5866543),
+[@sturm2020scirpy] and we provide the main output of this analysis (for cytotoxic cells) as a
+dataframe, which can be imported as follows:
+
+```{r eval=FALSE}
+scirpy_df <- read.csv(
+  "download_dir/CITE-seq/scirpy_tcr_output.tsv",
+  header = TRUE
+)
 ```
 
 
