@@ -121,18 +121,56 @@ end-to-end analysis, from raw data to final Seurat objects and figures in the pa
 
 
 The following UMAPs inform about the main cell populations and number of cells
-per assay:
+per assay in the discovery cohort:
 
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics("tonsil_atlas_umaps.png")
 ```
 
+Within the discovery cohort, we first defined 9 main compartments: (1) NBC and MBC,
+(2) GC B cells (GCBC), (3) PC, (4) CD4 T cells, (5) cytotoxic cells
+[CD8 T cells, NK, ILC, double negative T cells (DN)], (6) myeloid cells
+(DC, macrophages, monocytes, granulocytes, mast cells), (7) FDC, (8) epithelial
+cells and (9) plasmacytoid dendritic cells (PDC):
 
-The dataset was originally analyzed with [Seurat](https://satijalab.org/seurat/).
- Important links:
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics("tonsil_atlas_umap_9_compartments.png")
+```
 
-* [Github repository with the full set of Rmd notebooks needed to go from raw expression matrices to the final objects](TODO add link).
-* [Zenodo repository where we deposited the Seurat objects](https://zenodo.org/record/6340174/#.Yl7BH39BxH4).
+Subsequently, we clustered and annotated cell subtypes within each of the main
+compartments, giving rise to the 121 cell types and states in the atlas. To
+transfer the cell type labels across modalities and to the validation dataset,
+we developed [SLOcatoR](https://github.com/massonix/SLOcatoR) (see methods of the
+paper). Note: we provide SLOcatoR as an R package to promote reproducibility and
+best practices in scientific computing, but we refer the users to properly
+benchmarked tools to annotate their datasets such as [Azimuth](https://www.cell.com/cell/fulltext/S0092-8674%2821%2900583-3),
+[scArches](https://www.nature.com/articles/s41587-021-01001-7), or [Symphony](https://www.nature.com/articles/s41467-021-25957-x).
+
+We applied SLOcatoR to annotate cells from the validation cohort (1) to confirm
+the presence, annotation and markers of cell types; (2) to extend the atlas
+through an integrated validation dataset, and (3) to chart compositional
+changes in the tonsil during aging. The integrated tonsil atlas represented
+over 462,000 single-cell transcriptomes:
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics("tonsil_atlas_umap_discovery_validation_cohort.png")
+```
+
+Finally, we focused again on each of the 9 compartments and retransferred the
+final annotation level. As an example, here we can see the transferred annotation
+for CD4 T cells:
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics("tonsil_atlas_umap_discovery_validation_cohort_CD4.png")
+```
+
+Overall, we could validate most of the cell types, as they preserved their
+marker genes and had a high annotation confidence in the validation cohort.
+However, (1) transient cell states, (2) underrepresented cell types, or
+(3) clusters that are at the intersection between two main compartments and
+might represent doublets had low annotation confidences. We provide this
+interpretation in the Glossary (see below), and encourage future efforts to
+validate these annotations.
 
 
 # Assay types
