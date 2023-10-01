@@ -1,6 +1,6 @@
 ---
 title: "HCATonsilData"
-author: "Ramon Massoni-Badosa, Federico Marini & Alan O'Callaghan"
+author: "Ramon Massoni-Badosa, Federico Marini, Alan O'Callaghan & Helena Crowell"
 date: "`r BiocStyle::doc_date()`"
 output: 
   BiocStyle::html_document:
@@ -27,35 +27,42 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-Secondary lymphoid organs (SLO) are essential to develop tolerance and adaptive
-immunity against self or foreign antigens, respectively. They include lymph
-nodes, spleen, Peyer’s Patches, mucosal-associated lymphoid tissue (MALT) and
-the Waldeyer's tonsillar ring (including pharyngeal, adenoids, tubal, lingual
-and palatine tonsils). Tonsils are located strategically at the intersection
-between the respiratory and digestive tracts, where they are bombarded with
-antigens. In this setting, tonsils have large and active germinal centers,
-which makes them an appealing organ for the study of the interplay between
-innate and adaptive immune cells, their role in follicular and germinal center
-development and in the formation of active adaptive immunity and respective
-memory. In addition, tonsils are routinely obtained in hospitals, making them
-an overall great model SLO [@ruddle2009secondary].
+Palatine tonsils are under constant exposure to antigens via the upper
+respiratory tract, which makes them a compelling model secondary lymphoid organ
+(SLO) to study the interplay between innate and adaptive immune cells
+[@ruddle2009secondary]. Tonsils have a non-keratinizing stratified squamous
+epithelium, organized into tubular, branched crypts that enlarge the tonsillar
+surface. Within the crypts, microfold cells (or M cells) sample antigens at
+their apical membrane. Subsequently, antigen presenting cells (APC), such as
+dendritic cells (DC), process and present antigens to T cells in the
+interfollicular or T cell zone. Alternatively, antigens are kept intact by
+follicular dendritic cells (FDC) in lymphoid follicles, where they are
+recognized by B cells [@nave2001morphology]. Such recognition triggers the
+GC reaction, whereby naive B cells (NBC) undergo clonal selection,
+proliferation, somatic hypermutation, class switch recombination (CSR) and
+differentiation into long-lived plasma cells (PC) or memory B cells (MBC)
+[@de2015dynamics].
 
-In the context of the Human Cell Atlas (HCA) [@regev2018human], we have created a taxonomy of cell
-types and states in a human tonsil. Because the transcritpome is just a snapshot
-of a cell's state, we have added other layers to define cell identity: 
-single-cell resolved open chromatin epigenomic landscapes (scATAC-seq and
-scRNA/ATAC-seq; i.e. Multiome) as well as protein (CITE-seq), adaptive
-repertoire (single-cell B and T cell receptor sequencing; i.e. scBCR-seq and
-scTCR-seq) and spatial transcriptomics (ST) profiles.
+In the context of the Human Cell Atlas (HCA) [@regev2018human], we have created 
+a taxonomy of 121 cell types and states in a human tonsil. Since the transcritpome
+is just a snapshot of a cell's state [@wagner2016revealing], we have added other
+layers to define cell identity: single-cell resolved open chromatin epigenomic
+landscapes (scATAC-seq and scRNA/ATAC-seq; i.e. Multiome) as well as protein
+(CITE-seq), adaptive repertoire (single-cell B and T cell receptor sequencing;
+i.e. scBCR-seq and scTCR-seq) and spatial transcriptomics (ST) profiles.
 
 The HCATonsilData package aims to provide programmatic and modular access to the
-datasets of the different modalities and cells types of the tonsil atlas.
+datasets of the different modalities and cell types of the tonsil atlas.
+HCATonsilData also documents how the dataset was generated and archived in
+different repositories, from raw fastq files to processed datasets. It also
+explains in detail the cell- and sample-level metadata, and allows users to
+traceback the annotation of each cell type through an interactive Glossary.
 
 
 # Installation
 
 ```{r eval=FALSE}
-devtools::install_github("massonix/HCATonsilData", build_vignettes = TRUE)
+devtools::install_github("massonix/HCATonsilData", build_vignettes = TRUE) # TODO: 
 ```
 
 Once we have installed the package, we can load it:
