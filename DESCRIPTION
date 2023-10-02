@@ -2,14 +2,17 @@ Package: HCATonsilData
 Title: Provide programmatic access to the tonsil cell atlas datasets 
 Version: 0.99.1
 Authors@R: c(person("Ramon", "Massoni-Badosa", role = c("aut", "cre"),
-                    email="ramon.massoni@cnag.crg.eu",
+                    email ="ramon.massoni@cnag.crg.eu",
                     comment = c(ORCID = "0000-0001-7115-8145")),
              person("Federico", "Marini", role = c("aut"),
                     email = "marinif@uni-mainz.de", 
                     comment = c(ORCID = "0000-0003-3252-7758")),
              person("Alan", "O'Callaghan", role = c("aut"),
-                    email = "alan.ocallaghan@outlook.com")
-           )
+                    email = "alan.ocallaghan@outlook.com"),
+	           person("Helena L.", "Crowell", role=c("aut"),
+	                  email="helena@crowell.eu", 
+	                  comment = c(ORCID="0000-0002-4801-1767"))
+             )
 Description: This package provides access to the scRNA-seq, scATAC-seq,
     multiome, CITE-seq and spatial transcriptomics (Visium) data generated
     by the tonsil cell atlas in the context of the Human Cell Atlas (HCA).
@@ -23,6 +26,7 @@ RoxygenNote: 7.2.3
 Imports: 
     ExperimentHub,
     SingleCellExperiment,
+    SpatialExperiment,
     HDF5Array,
     SummarizedExperiment,
     htmltools,
@@ -39,6 +43,6 @@ Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://github.com/massonix/HCATonsilData
 BugReports: https://github.com/massonix/HCATonsilData/issues
-biocViews: SingleCellData, ExperimentData, RNASeqData, ExperimentHub, SpatialData
+biocViews: SingleCellData, ExperimentData, RNASeqData, ExperimentHub, ExpressionData, SpatialData
 Depends: 
     R (>= 4.3.0)

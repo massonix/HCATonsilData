@@ -1,6 +1,6 @@
 ---
 title: "HCATonsilData"
-author: "Ramon Massoni-Badosa, Federico Marini & Alan O'Callaghan"
+author: "Ramon Massoni-Badosa, Federico Marini, Alan O'Callaghan & Helena Crowell"
 date: "`r BiocStyle::doc_date()`"
 output: 
   BiocStyle::html_document:
@@ -12,7 +12,7 @@ vignette: >
   %\VignetteKeywords{GeneExpression, RNASeq, SingleCell, ATACSeq, Spatial, CITESeq}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 bibliography: HCATonsilData.bib
 ---
 
@@ -27,53 +27,72 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-Secondary lymphoid organs (SLO) are essential to develop tolerance and adaptive
-immunity against self or foreign antigens, respectively. They include lymph
-nodes, spleen, Peyer’s Patches, mucosal-associated lymphoid tissue (MALT) and
-the Waldeyer's tonsillar ring (including pharyngeal, adenoids, tubal, lingual
-and palatine tonsils). Tonsils are located strategically at the intersection
-between the respiratory and digestive tracts, where they are bombarded with
-antigens. In this setting, tonsils have large and active germinal centers,
-which makes them an appealing organ for the study of the interplay between
-innate and adaptive immune cells, their role in follicular and germinal center
-development and in the formation of active adaptive immunity and respective
-memory. In addition, tonsils are routinely obtained in hospitals, making them
-an overall great model SLO [@ruddle2009secondary].
+Palatine tonsils are under constant exposure to antigens via the upper
+respiratory tract, which makes them a compelling model secondary lymphoid organ
+(SLO) to study the interplay between innate and adaptive immune cells
+[@ruddle2009secondary]. Tonsils have a non-keratinizing stratified squamous
+epithelium, organized into tubular, branched crypts that enlarge the tonsillar
+surface. Within the crypts, microfold cells (or M cells) sample antigens at
+their apical membrane. Subsequently, antigen presenting cells (APC), such as
+dendritic cells (DC), process and present antigens to T cells in the
+interfollicular or T cell zone. Alternatively, antigens are kept intact by
+follicular dendritic cells (FDC) in lymphoid follicles, where they are
+recognized by B cells [@nave2001morphology]. Such recognition triggers the
+GC reaction, whereby naive B cells (NBC) undergo clonal selection,
+proliferation, somatic hypermutation, class switch recombination (CSR) and
+differentiation into long-lived plasma cells (PC) or memory B cells (MBC)
+[@de2015dynamics].
 
-In the context of the Human Cell Atlas (HCA) [@regev2018human], we have created a taxonomy of cell
-types and states in a human tonsil. Because the transcritpome is just a snapshot
-of a cell's state, we have added other layers to define cell identity: 
-single-cell resolved open chromatin epigenomic landscapes (scATAC-seq and
-scRNA/ATAC-seq; i.e. Multiome) as well as protein (CITE-seq), adaptive
-repertoire (single-cell B and T cell receptor sequencing; i.e. scBCR-seq and
-scTCR-seq) and spatial transcriptomics (ST) profiles.
+In the context of the Human Cell Atlas (HCA) [@regev2018human], we have created 
+a taxonomy of 121 cell types and states in a human tonsil. Since the transcritpome
+is just a snapshot of a cell's state [@wagner2016revealing], we have added other
+layers to define cell identity: single-cell resolved open chromatin epigenomic
+landscapes (scATAC-seq and scRNA/ATAC-seq; i.e. Multiome) as well as protein
+(CITE-seq), adaptive repertoire (single-cell B and T cell receptor sequencing;
+i.e. scBCR-seq and scTCR-seq) and spatial transcriptomics (ST) profiles.
 
 The HCATonsilData package aims to provide programmatic and modular access to the
-datasets of the different modalities and cells types of the tonsil atlas.
+datasets of the different modalities and cell types of the tonsil atlas.
+HCATonsilData also documents how the dataset was generated and archived in
+different repositories, from raw fastq files to processed datasets. It also
+explains in detail the cell- and sample-level metadata, and allows users to
+traceback the annotation of each cell type through an interactive Glossary.
 
 
-# Installation
+# Getting Started
 
-```{r eval=FALSE}
-devtools::install_github("massonix/HCATonsilData", build_vignettes = TRUE)
-```
-
-Once we have installed the package, we can load it:
+Load the packages in R
 
 ```{r message=FALSE}
 library(HCATonsilData)
 library(SingleCellExperiment)
 library(ExperimentHub)
 library(ggplot2)
+library(knitr)
+library(kableExtra)
 ```
 
 
 # Overview of the dataset
 
-We obtained a total of ten human tonsils. These tonsils covered
-three age groups: kids (n=6, 3-5 years), young adults (n=3, 26-35 years) and
-old adults (n=1, 65 years). Here's a more detailed explanation of the different
-types of assay:
+We obtained a total of 17 human tonsils, which covered three age groups:
+children (n=6, 3-5 years), young adults (n=8, 19-35 years), and old adults
+(n=3, 56-65 years). We collected them in a discovery cohort (n=10), which we
+used to cluster and annotate cell types; and a validation cohort (n=7), 
+which we used to validate the presence, annotation and markers of the discovered
+cell types. The following table corresponds to the donor-level metadata:
+
+```{r}
+kable(
+  donor_metadata,
+  format = "markdown",
+  caption = "Donor Metadata",
+  align = "c"
+) |> kable_styling(full_width = FALSE)
+```
+
+
+These tonsil samples were processed with different data modalities:
 
 * scRNA-seq ([10X Chromium v3](https://www.10xgenomics.com/products/single-cell-gene-expression))
 * scATAC-seq ([10X Chromium](https://www.10xgenomics.com/products/single-cell-atac))
@@ -81,54 +100,34 @@ types of assay:
 * [CITE-seq](https://www.nature.com/articles/nmeth.4380): joint transcriptome + ~200 protein surface markers for each cell.
 * [Spatial transcriptomics]([10X Visium](https://www.10xgenomics.com/products/spatial-gene-expression))
 
-The following heatmap informs about which samples where sequenced with which
-technology:
+The following heatmap informs about which samples were sequenced with which
+technology and cohort type:
 
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics("tonsil_atlas_cohort.png")
 ```
 
 
-The following UMAPs inform about the main cell populations and number of cells
-per assay:
+For each data modality, we mapped all raw fastq files with the appropriate flavor
+of [cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger)
+(e.g. cellranger-atac, spaceranger, etc), and analyzed all datasets within the
+[Seurat](https://satijalab.org/seurat/) ecosystem [@hao2021integrated]. All
+fastq files are deposited at EGA under accession number [EGAS00001006375](https://ega-archive.org/studies/EGAS00001006375).
+The expression and accessibility matrices are deposited in Zenodo under record [6678331](https://zenodo.org/record/6678331).
+The Seurat objects from which the data of this repository is derived are archived in Zenodo under record [8373756](https://zenodo.org/record/8373756).
+Finally, the GitHub repository [Single-Cell-Genomics-Group-CNAG-CRG/TonsilAtlas](https://github.com/Single-Cell-Genomics-Group-CNAG-CRG/TonsilAtlas) documents the full
+end-to-end analysis, from raw data to final Seurat objects and figures in the paper.
 
-```{r, echo=FALSE, out.width = "100%"}
-knitr::include_graphics("tonsil_atlas_umaps.png")
-```
-
-
-The dataset was originally analyzed with [Seurat](https://satijalab.org/seurat/).
-[@hao2021integrated] Important links:
-
-* [Github repository with the full set of Rmd notebooks needed to go from raw expression matrices to the final objects](TODO add link).
-* [Zenodo repository where we deposited the Seurat objects](https://zenodo.org/record/6340174/#.Yl7BH39BxH4).
-
-
-# Assay types
-
-HCATonsilData provides access to 4 main types of assays: RNA, ATAC, CITE-seq and
-Spatial.
-
-## RNA
-
-We can obtain the `SingleCellExperiment` object with transcriptomics (RNA)
-data as follows:
-
-```{r}
-(sce <- HCATonsilData(assayType = "RNA", cellType = "All"))
-table(sce$assay)
-```
-
-
-As you can see, this object consists of 209786 profiled with scRNA-seq (3P)
-and 53513 cells profiled with multiome. Initially, we aimed to also use CITE-seq
-to cluster cells in our tonsil atlas. However, we noticed that with CITE-seq we
-detected 2.75X and 2.98X fewer genes than with scRNA-seq and Multiome, respectively:
+To define the tonsillar cell types, we first aimed to cluster cells using
+the combined expression data from scRNA-seq, Multiome and CITE-seq datasets.
+However, we noticed that with CITE-seq we detected 2.75X and 2.98X fewer genes
+than with scRNA-seq and Multiome, respectively:
 
 ```{r eval=FALSE, echo=FALSE}
 df <- colData(sce)[, c("assay", "nFeature_RNA")]
 df <- as.data.frame(df)
-cite <- readRDS("inst/scripts/cite_raw_data/20220215_tonsil_atlas_cite_seurat_obj.rds")
+# The next object is available here: https://zenodo.org/record/6340174/files/20220215_tonsil_atlas_cite_seurat_obj.rds
+cite <- readRDS("inst/scripts/cite_raw_data/20220215_tonsil_atlas_cite_seurat_obj.rds") 
 cite <- cite@meta.data[, c("assay", "nFeature_RNA")]
 df <- rbind(df, cite)
 df$assay <- factor(df$assay, levels = c("3P", "multiome", "CITE-seq"))
@@ -143,69 +142,110 @@ ggplot(df, aes(assay, nFeature_RNA, fill = assay)) +
   theme_classic() +
   theme(legend.position = "none")
 ```
-
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics("tonsil_atlas_n_detected_genes.png")
 ```
 
 Because we did not want to bias the clustering towards the modality that
-provides less information, we first focused on scRNA-seq and Multiome together,
+provides less information, we first analyzed scRNA-seq and Multiome together,
 and use CITE-seq to validate the annotation (see below). However, a recent
 benchmarking effort showed that scRNA-seq and single-nuclei RNA-seq (such as
-Multiome) mix very poorly [@mereu2020benchmarking]. Indeed, we observed massive batch effects 
-between both modalities (see manuscript). To overcome it, we found highly variable
-genes (HVG) for each modality independently. We then intersected both sets of
-HVG to remove modality-specific variation. Following principal component
-analysis (PCA), we integrated scRNA-seq and Multiome with Harmony (TODO cite). Harmony
-Harmony scales well to atlas-level dataset and ranks among the best-performing
-tools in different benchmarks [@korsunsky2019fast]. We have automatized this two-step
-approach in [SLOcatoR](https://github.com/massonix/SLOcatoR), an R package that annotates
-transcriptomes and chromatin accessibility profiles from SLO. As shown in the
-manuscript, we successfully corrected for batch effects while preserving
-biological variation.
-To cluster cells we followed a top-down approach, from general to specific, 
-stratified by levels. In each level, we perform the two-step process describe
-above, which finds finer-grained heterogeneity in a recursive manner. Then, we
-used the batch-corrected principal components (harmony components), to calculate
-a K-nearest neighbor graph (KNN graph). Louvain clustering uses this KNN graph
-to assign a cluster to each cell. In level 1, we identified 11 main cell
-populations, which we annotated using well-defined marker genes:
+Multiome) mix very poorly [@mereu2020benchmarking]. Indeed, we observed massive
+batch effects between both modalities (see manuscript). To overcome it, we
+found highly variable genes (HVG) for each modality independently. We then
+intersected both sets of HVG to remove modality-specific variation. Following
+principal component analysis (PCA), we integrated scRNA-seq and Multiome with
+Harmony [@mereu2020benchmarking]. Harmony scales well to atlas-level datasets
+and ranks among the best-performing tools in different benchmarks.
 
-```{r}
-df <- as.data.frame(colData(sce))
-cols <- c("#5A5156", "#E4E1E3", "#F6222E", "#FE00FA", "#16FF32", "#3283FE",
-          "#FEAF16", "#B00068","#1CFFCE",  "#90AD1C", "#2ED9FF") 
-ggplot(df, aes(UMAP_1_level_1, UMAP_2_level_1, col = annotation_level_1)) +
-  geom_point(shape = ".") +
-  scale_color_manual(values = cols) +
-  labs(title = "Annotation Level 1", x = "UMAP1", y = "UMAP2") +
-  theme_classic() +
-  theme(
-    plot.title = element_text(hjust = 0.5),
-    legend.title = element_blank(),
-    axis.text = element_blank(),
-    axis.ticks = element_blank()
-  ) +
-  guides(colour = guide_legend(override.aes = list(size = 2, shape = 16)))
+These steps are performed using [SLOcatoR](https://github.com/massonix/SLOcatoR)
+(see methods of the paper), which allowed 1. to remove batch effects between
+scRNA-seq and Multiome, 2. to transfer cell type labels from Multiome to scATAC-seq,
+and from scRNA-seq to CITE-seq. Thus, this strategy allowed us to annotate clusters
+using information across multiple modalities (RNA expression, protein expression,
+TF motifs, etc.).
+
+Note: we provide SLOcatoR as an R package to promote reproducibility and
+best practices in scientific computing, but we refer the users to properly
+benchmarked tools to annotate their datasets such as
+[Azimuth](https://www.cell.com/cell/fulltext/S0092-8674%2821%2900583-3),
+[scArches](https://www.nature.com/articles/s41587-021-01001-7),
+or [Symphony](https://www.nature.com/articles/s41467-021-25957-x).
+
+
+Within the discovery cohort, we first defined 9 main compartments: (1) NBC and MBC,
+(2) GC B cells (GCBC), (3) PC, (4) CD4 T cells, (5) cytotoxic cells
+[CD8 T cells, NK, ILC, double negative T cells (DN)], (6) myeloid cells
+(DC, macrophages, monocytes, granulocytes, mast cells), (7) FDC, (8) epithelial
+cells and (9) plasmacytoid dendritic cells (PDC):
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics("tonsil_atlas_umap_9_compartments.png")
+```
+
+Subsequently, we clustered and annotated cell subtypes within each of the main
+compartments, giving rise to the 121 cell types and states in the atlas. The
+following UMAPs inform about the main cell populations and number of cells
+per assay in the discovery cohort:
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics("tonsil_atlas_umaps.png")
+```
+We then applied SLOcatoR to annotate cells from the validation cohort (1) to confirm
+the presence, annotation and markers of cell types; (2) to extend the atlas
+through an integrated validation dataset, and (3) to chart compositional
+changes in the tonsil during aging. The integrated tonsil atlas represented
+over 462,000 single-cell transcriptomes:
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics("tonsil_atlas_umap_discovery_validation_cohort.png")
+```
+
+Finally, we focused again on each of the 9 compartments and retransferred the
+final annotation level. As an example, here we can see the transferred annotation
+for CD4 T cells, from discovery to validation cohort:
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics("tonsil_atlas_umap_discovery_validation_cohort_CD4.png")
+```
+
+Overall, we could validate most of the cell types, as they preserved their
+marker genes and had a high annotation confidence in the validation cohort.
+However, (1) transient cell states, (2) underrepresented cell types, or
+(3) clusters that are at the intersection between two main compartments and
+might represent doublets had low annotation confidences. We provide this
+interpretation in the Glossary (see below).
+
+
+# Assay types
+
+HCATonsilData provides access to 5 main types of assays: RNA, ATAC, Multiome
+CITE-seq and Spatial.
+
+## RNA
+
+We can obtain the `SingleCellExperiment` object with gene expression (RNA)
+data as follows:
+
+```{r eval=FALSE}
+(sce <- HCATonsilData(assayType = "RNA", cellType = "All"))
+table(sce$assay)
+# setting this chunk to eval=FALSE, otherwise the vignette takes too long to compile
 ```
 
 
-For each cluster at level 1, we followed multiple levels of integration,
-clustering, and removal of poor-quality cells. Finally, we annotated them to
-specific cell types and states, which are stored in the variable
-`annotation_20220215`.
-
-We can dowload a `SingleCellExperiment` object specific to each of the main
-subpopulations defined at level 1 as follows:
+As you can see, this object consists of 377,988 profiled with scRNA-seq (3P)
+and 84,364 cells profiled with multiome. We can dowload a `SingleCellExperiment`
+object specific to each of the main subpopulations defined at level 1 as follows:
 
 ```{r}
 listCellTypes(assayType = "RNA")
 (epithelial <- HCATonsilData(assayType = "RNA", cellType = "epithelial"))
 df <- as.data.frame(colData(epithelial))
-ggplot(df, aes(UMAP_1_20220215, UMAP_2_20220215, col = annotation_20220215)) +
+ggplot(df, aes(UMAP_1_20220215, UMAP_2_20220215, col = annotation_20230508)) +
   geom_point() +
   scale_color_manual(values = cols) +
-  labs(title = "Annotation 20220215", x = "UMAP1", y = "UMAP2") +
+  labs(title = "Annotation 20230508", x = "UMAP1", y = "UMAP2") +
   theme_classic() +
   theme(
     plot.title = element_text(hjust = 0.5),
@@ -216,55 +256,156 @@ ggplot(df, aes(UMAP_1_20220215, UMAP_2_20220215, col = annotation_20220215)) +
 ```
 
 As we can see, the annotation we are currently using has a date associated with
-it. Initially, we annotated each clusters with the best information we had at
-a given point in time, based on previously published literature and to the best
-of our knowledge. However, annotations are imperfect by nature, and they need
-to be reassessed after new evidence is available or other experts look at the
-data. In this setting, we will add a new column to the `colData` slot of each
-SingleCellExperiment object every time we update the annotation, with the form
-`annotation_date`.
-In addition, future versions of HCATonsilData will contain dataframes that
-allow to traceback the reasoning for each annotation: which markers where used,
-which are the key references, brief explanation of the rationale, etc (TODO).
+it. If other immunologists look at the data and propose modifications, we will
+add additional time-stamped annotations in future releases of `HCATonsilData`.
+
 
 Here's a brief explanation of all the variables in the colData slot of the
 `SingleCellExperiment` objects:
 
 
 * barcode: the cell barcode. Combination of [GEM well](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/glossary) and cellranger 10X barcode.
-* donor_id
-* gem_id: we gave a unique hashtag to each GEM well (10X Chip Channel) in our dataset. This allows to traceback all the metadata for a given cell.       
-* library_name: each GEM well can give rise to multiple Illumina libraries (example: multiome, cell hashing, etc.).
+* donor_id: the donor-specific identifier, which can be used to retrieve donor-level metadata form the table above.
+* gem_id: we gave a unique hashtag to each [GEM well](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/glossary) (10X Chip Channel) in our dataset. This allows to traceback all the metadata for a given cell.       
+* library_name: each GEM well can give rise to multiple Illumina libraries. For example, one Multiome GEM well will give rise to 2 illumina libraries (ATAC and RNA).
 * assay: 3P (scRNA-seq) or multiome
 * sex
 * age
 * age_group: kid, young adult, old adult
-* hospital: hospital where the tonsils where obtained [Hospital Clinic](https://www.clinicbarcelona.org/) or [CIMA](https://cima.cun.es/).
-* UMAP_1_level_1, UMAP_2_level_1: UMAP1 coordinates of the figure 1b of our manuscript
+* hospital: hospital where the tonsils where obtained [Hospital Clinic](https://www.clinicbarcelona.org/), [CIMA](https://cima.cun.es/), or Newcastle.
+* cohort_type: discovery or validation cohort
+* cause_for_tonsillectomy: condition that led to the tonsillectomy (e.g. tonsillitis, sleep apnea, etc.)
+* is_hashed: whether we used [cell hashing](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-018-1603-1) or not.
+* preservation: whether we processed the sample fresh or frozen.
 * nCount_RNA, nFeature_RNA: number of counts and features (genes) detected per cell.
 * pct_mt, pct_ribosomal: percentage of counts that map to mitochondrial (^MT) or ribosomal (^RPS) genes.
-* is_hashed: whether we used [cell hashing](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-018-1603-1) or not.
 * pDNN_hashing, pDNN_scrublet, pDNN_union: proportion of doublet nearest neighbors (pDNN) using different doublet annotations.
-* scrublet_doublet_scores
-* scrublet_predicted_doublet
 * S.Score, G2M.Score Phase, CC.Difference: outputs of the [CellCycleScoring](https://rdrr.io/cran/Seurat/man/CellCycleScoring.html) from `Seurat`.
-* annotation_level_1: annotation used at our level 1 clustering (see above).
+* scrublet_doublet_scores: doublet score obtained with [Scrublet](https://www.cell.com/cell-systems/fulltext/S2405-4712(18)30474-5?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS2405471218304745%3Fshowall%3Dtrue)
+* scrublet_predicted_doublet: doublet annotation obtained with Scirpy (doublet or singlet)
+* doublet_score_scDblFinder: doublet score obtained with [scDblFinder](https://f1000research.com/articles/10-979), which was run in the validation cohort following [the most recent best practices for single-cell analysis](https://www.nature.com/articles/s41576-023-00586-w).
+* annotation_level_1: annotation used at our level 1 clustering (9 main compartments).
+* annotation_level_1_probability: annotation confidence for the level 1 annotation (relevant for validation cohort, as it implied KNN annotation)
 * annotation_figure_1: annotation used in the figure 1 of our manuscript. This annotation consisted of grouping the final subtypes into main cell types that were distinguishable in the UMAP.
+* annotation_20220215, annotation_20220619, annotation_20230508: time-stampled annotation for cell types.
+* annotation_20230508_probability: annotation confidence for the final annotation (relevant for validation cohort, as it implied KNN annotation)
+* UMAP_1_level_1, UMAP_2_level_1: UMAP1 coordinates of the figure 1B of the article.
 * annotation_20220215: see above.
 * UMAP_1_20220215, UMAP_2_20220215: UMAP coordinates used in figures of the preprint for each cell type.
 
 
-## ATAC
+## ATAC and Multiome
 
-Coming soon! (TODO)
+Since there is not a popular Bioconductor package to analyze or store scATAC-seq data,
+we point users to the scATAC-seq and Multiome Seurat objects that we created
+using [Signac](https://stuartlab.org/signac/) [@stuart2021single].
+
+Here are the instructions to download the scATAC-seq object:
+
+```{r eval=FALSE}
+library(Seurat)
+library(Signac)
+dir.create("download_dir")
+options(timeout = 10000000)
+atac_url <- "https://zenodo.org/record/8373756/files/TonsilAtlasSeuratATAC.tar.gz"
+download.file(url = atac_url, destfile = "download_dir/TonsilAtlasSeuratATAC.tar.gz")
+# Advice: check that the md5sum is the same as the one in Zenodo
+untar("download_dir/TonsilAtlasSeuratATAC.tar.gz", exdir = "download_dir")
+atac <- readRDS("download_dir/scATAC-seq/20230911_tonsil_atlas_atac_seurat_obj.rds")
+atac
+```
+
+
+The multiome object contains 68,749 cells that passed both RNA and ATAC QC filters.
+Here are the instructions to download the Multiome object:
+
+```{r eval=FALSE}
+library(Seurat)
+library(Signac)
+dir.create("download_dir")
+options(timeout = 10000000)
+multiome_url <- "https://zenodo.org/record/8373756/files/TonsilAtlasSeuratMultiome.tar.gz"
+download.file(url = multiome_url, destfile = "download_dir/TonsilAtlasSeuratMultiome.tar.gz")
+# Advice: check that the md5sum is the same as the one in Zenodo
+untar("download_dir/TonsilAtlasSeuratMultiome.tar.gz", exdir = "download_dir")
+multiome <- readRDS("download_dir/multiome/20230911_tonsil_atlas_multiome_seurat_obj.rds")
+multiome
+```
+
+
+**Note**: we may version these two objects in Zenodo to polish the annotation.
+Therefore, we recommend users to check that this is the most updated version
+of the object in Zenodo.
+
+To recall peaks or visualize chromatin tracks, it is essential to have access to
+the [fragments file](https://support.10xgenomics.com/single-cell-atac/software/pipelines/latest/output/fragments).
+We modified the original fragments files generated by
+cellranger-atac or cellranger-arc to include the [gem_id](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/glossary)
+as prefix. These files can be downloaded as follows:
+
+```{r eval=FALSE}
+dir.create("download_dir")
+fragments_url <- "https://zenodo.org/record/8373756/files/fragments_files.tar.gz"
+download.file(url = fragments_url, destfile = "download_dir/fragments_files.tar.gz")
+untar("download_dir/fragments_files.tar.gz", exdir = "download_dir")
+```
+
+**Note**: it is paramount to update the paths to the fragments files in each
+ChromatinAssay object using the [UpdatePath](https://stuartlab.org/signac/reference/updatepath)
+function.
+
+The chromatin accessibility side of these objects was processed using the
+general pipeline from [Signac](https://stuartlab.org/signac/articles/pbmc_vignette). Briefly:
+
+* We called peaks using [MACS2](https://pypi.org/project/MACS2/) (as implemented in the [CallPeaks](https://www.rdocumentation.org/packages/Signac/versions/1.10.0/topics/CallPeaks) function), generating pseudobulks for each of the main 9 compartments.
+* We quantified the accessibility for each peak and each cell using the [FeatureMatrix](https://stuartlab.org/signac/reference/featurematrix) function.
+* We normalized data using the term frequency inverse document frequency (TF-IDF) normalization, as implemented in the [RunTFIDF](https://stuartlab.org/signac/reference/runtfidf) function.
+* We reduced the dimensionality using latent semantic indexing ([RunLSI](https://www.rdocumentation.org/packages/Seurat/versions/3.1.4/topics/RunLSI) function)
+
+For Multiome, we additionally computed a weighted KNN graph with the
+[FindMultiModalNeighbors](https://satijalab.org/seurat/reference/findmultimodalneighbors) function.
+
+Many variables in the metadata slot are shared with scRNA-seq. Here, we explain
+the meaning of the variables that are specific to Multiome or scATAC-seq:
+
+* nCount_ATAC: total number of counts per cell
+* nFeature_ATAC: total number of peaks detected per cell
+* is_facs_sorted: whether that particular sample was FACS-sorted to eliminate dead cells
+* nucleosome_signal: as explained in Signac, *Nucleosome banding pattern: The histogram of DNA fragment sizes (determined from the paired-end sequencing reads) should exhibit a strong nucleosome banding pattern corresponding to the length of DNA wrapped around a single nucleosome. We calculate this per single cell, and quantify the approximate ratio of mononucleosomal to nucleosome-free fragments*
+* nucleosome_percentile: percentile rank of each ratio of mononucleosomal to nucleosome-free fragments per cell (see [NucleosomeSignal](https://stuartlab.org/signac/reference/nucleosomesignal) function)
+* TSS.enrichment: as explained in Signac, *The ENCODE project has defined an ATAC-seq targeting score based on the ratio of fragments centered at the TSS to fragments in TSS-flanking regions (see https://www.encodeproject.org/data-standards/terms/). Poor ATAC-seq experiments typically will have a low TSS enrichment score.*
+* TSS.percentile
+* RNA.weight: the weight that RNA has in the weighted nearest neihbor graph per cell (multiome-specific)
+* ATAC.weight: the weight that RNA has in the weighted nearest neihbor graph per cell (multiome-specific)
+
 
 ## CITE-seq
 
-Coming soon! (TODO) For now you can download the original `Seurat` object with the
-following code:
+The CITE-seq object can be downloaded as follows:
 
-```{r}
-#code to download specific CITE seq from zenodo
+```{r eval=FALSE}
+library(Seurat)
+dir.create("download_dir")
+options(timeout = 10000000)
+cite_url <- "https://zenodo.org/record/8373756/files/TonsilAtlasSeuratCITE.tar.gz"
+download.file(url = cite_url, destfile = "download_dir/TonsilAtlasSeuratCITE.tar.gz")
+# Advice: check that the md5sum is the same as the one in Zenodo
+untar("download_dir/TonsilAtlasSeuratCITE.tar.gz", exdir = "download_dir")
+cite <- readRDS("download_dir/CITE-seq/20220215_tonsil_atlas_cite_seurat_obj.rds")
+cite
+```
+
+
+Together with CITE-seq, we also applied scBCR-seq and scTCR-seq. This data was
+analyzed with [scirpy](https://academic.oup.com/bioinformatics/article/36/18/4817/5866543),
+[@sturm2020scirpy] and we provide the main output of this analysis (for cytotoxic cells) as a
+dataframe, which can be imported as follows:
+
+```{r eval=FALSE}
+scirpy_df <- read.csv(
+  "download_dir/CITE-seq/scirpy_tcr_output.tsv",
+  header = TRUE
+)
 ```
 
 
@@ -274,7 +415,9 @@ Coming soon! (TODO) For now you can download the original `Seurat` object with t
 following code:
 
 ```{r}
-#code to download specific spatialfrom zenodo
+(spatial <- HCATonsilData(assayType = "Spatial"))
+
+# TODO Helena: Document basic slots of SpatialExperiment object
 ```
 
 
