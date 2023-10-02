@@ -1,0 +1,235 @@
+---
+title: "Download and preprocess the tonsil atlas data (RNA, version 2)"
+author: "Ramon Massoni-Badosa & Federico Marini"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(width = 100)
+```
+
+
+# Introduction
+
+Here we will download and process the version 2 of the [Seurat](https://zenodo.org/record/8373756) objects associated with the single-cell transcriptomes of the tonsil cell atlas to prepare them for submission to [`ExperimentHub`](https://bioconductor.org/packages/release/bioc/html/ExperimentHub.html). We will follow a similar style and structure as the one used for the [`TabulaMurisSenisData`](https://github.com/fmicompbio/TabulaMurisSenisData) package.
+
+
+
+# Loading required packages
+
+```{r packages}
+library(Seurat)
+library(SingleCellExperiment)
+library(scater)
+library(HDF5Array)
+library(rhdf5)
+library(here)
+library(glue)
+library(readr)
+library(dplyr)
+library(stringr)
+library(purrr)
+library(tools)
+```
+
+
+# Downloading the Seurat objects from Zenodo
+
+The Seurat objects derived from our tonsil atlas have been archived as .rds files in Zenodo under the record [8373756](https://zenodo.org/record/8373756). To generate the URL's for each dataset we used the [zenodo_get](https://github.com/dvolgyes/zenodo_get) package as follows:
+
+```{bash}
+zenodo_get 10.5281/zenodo.8373756 -w tmp.txt
+paste tmp.txt md5sums.txt | sed 's/\t/,/' | sed 's/ \{1,\}/,/g' > tonsil-atlas-zenodo-get-output_v2.csv
+```
+
+
+Let us read and curate the "tonsil-atlas-zenodo-get-output_v2.csv":
+
+```{r}
+# Read data
+path_to_csv1 <- here("inst/scripts/tonsil-atlas-zenodo-get-output_v2.csv")
+files_df <- read.csv(file = path_to_csv1, header = FALSE)
+colnames(files_df) <- c("url", "file_id", "file_name")
+```
+
+We proceed to download the RNA dataset:
+
+```{r}
+# Create data directories
+data_dir <- here("inst/scripts/rna_raw_data")
+out_dir <- here("inst/scripts/HCATonsilData/2.0/RNA")
+dir.create(data_dir, recursive = TRUE, showWarnings = TRUE)
+dir.create(out_dir, recursive = TRUE, showWarnings = TRUE)
+
+
+# Get URL and download
+options(timeout = 10000000)
+rna_url <- files_df[str_detect(files_df$file_name, "RNA"), "url"]
+out_file <- file.path(
+  data_dir,
+  files_df[str_detect(files_df$file_name, "RNA"), "file_name"]
+)
+download.file(url = rna_url, destfile = out_file)
+
+
+# Check MD5
+md5_original <- files_df[str_detect(files_df$file_name, "RNA"), "file_id"]
+md5_download <- md5sum(out_file)
+if (!md5_original == md5_download) {
+  stop("The file is corrupted!")
+}
+
+
+# Uncompress
+untar(out_file, exdir = data_dir)
+```
+
+
+# Process Seurat objects to extract relevant slots
+
+```{r}
+# Get gene information
+genes_df <- read_tsv(
+  here("inst/extdata/features.tsv.gz"),
+  col_names = c("ensembl_id", "symbol", "type")
+) %>%
+  filter(type == "Gene Expression") %>%
+  as.data.frame()
+gene_ids <- genes_df$ensembl_id
+names(gene_ids) <- genes_df$symbol
+
+
+# Process
+files_seurat <- list.files(file.path(data_dir, "scRNA-seq"), pattern = "rds")
+files_seurat <- str_subset(files_seurat, "atac", negate = TRUE)
+cell_types <- files_seurat %>%
+  str_split("_seurat_obj.rds") %>%
+  map_chr(1) %>%
+  str_remove("(20230911_|20220215_)")
+cell_types[cell_types == "tonsil_atlas_rna"] <- "All"
+cell_types <- str_replace(cell_types, "_", "-")
+names(files_seurat) <- cell_types
+for (cell_type in cell_types) {
+  print(cell_type)
+  
+  # Read Seurat object
+  file_path <- file.path(data_dir, "scRNA-seq", files_seurat[cell_type])
+  seurat <- readRDS(file_path)
+  dataset <- "RNA"
+  
+  # Extract and save reductions
+  if ("pca" %in% names(seurat@reductions)) {
+    tmpmat <- Embeddings(seurat, "pca")
+    path_to_save_dims <- file.path(out_dir, glue("{cell_type}_{dataset}_pca.rds"))
+    saveRDS(tmpmat, path_to_save_dims)
+  }
+  if ("harmony" %in% names(seurat@reductions)) {
+    tmpmat <- Embeddings(seurat, "harmony")
+    path_to_save_dims <- file.path(out_dir, glue("{cell_type}_{dataset}_harmony.rds"))
+    saveRDS(tmpmat, path_to_save_dims)
+  }
+  if ("umap" %in% names(seurat@reductions)) {
+    tmpmat <- Embeddings(seurat, "umap")
+    path_to_save_dims <- file.path(out_dir, glue("{cell_type}_{dataset}_umap.rds"))
+    saveRDS(tmpmat, path_to_save_dims)
+  }
+  
+  # Extract and save rowData and colData
+  saveRDS(
+    as(seurat@meta.data, "DataFrame"),
+    file.path(out_dir, glue("{cell_type}_{dataset}_coldata.rds"))
+  )
+  rowdata <- data.frame(gene_name = rownames(seurat))
+  rowdata$highly_variable <- ifelse(
+    rowdata$gene %in% rownames(seurat[["RNA"]]@scale.data),
+    TRUE,
+    FALSE
+  )
+  rowdata$gene_id <- gene_ids[rowdata$gene_name]
+  rowdata <- as(rowdata, "DataFrame")
+  rownames(rowdata) <- rowdata$gene_name
+  saveRDS(rowdata, file.path(out_dir, glue("{cell_type}_{dataset}_rowdata.rds")))
+  
+  # Extract and save raw and processed counts
+  cts <- seurat[["RNA"]]@counts
+  h5_file <- file.path(out_dir, glue("{cell_type}_{dataset}_counts.h5"))
+  if (!file.exists(h5_file)) {
+    mat_h5 <- writeHDF5Array(
+      cts,
+      filepath = h5_file,
+      name = "counts",
+      chunkdim = HDF5Array::getHDF5DumpChunkDim(dim(cts))
+    )
+  }
+  mat <- seurat[["RNA"]]@data
+  h5_file <- file.path(out_dir, glue("{cell_type}_{dataset}_processed.h5"))
+  if (!file.exists(h5_file)) {
+    mat_h5 <- writeHDF5Array(
+      mat,
+      filepath = h5_file,
+      name = "processed",
+      chunkdim = HDF5Array::getHDF5DumpChunkDim(dim(mat))
+    )
+  }
+  
+  # Remove Seurat object
+  rm(seurat)
+  gc()
+}
+```
+
+
+# Sanity checks
+
+As a sanity check, let us ensure that we can create successfully each SingleCellExperiment object from its individual slots:
+
+```{r}
+all_files <- list.files(out_dir, full.names = TRUE)
+for (cell_type in cell_types) {
+  print(cell_type)
+  path_to_cts <- str_subset(all_files, glue("{cell_type}.*counts.h5"))
+  path_to_processed <- str_subset(all_files, glue("{cell_type}.*processed.h5"))
+  path_to_rowdata <- str_subset(all_files, glue("{cell_type}.*rowdata.rds"))
+  path_to_coldata <- str_subset(all_files, glue("{cell_type}.*coldata.rds"))
+  path_to_pca <- str_subset(all_files, glue("{cell_type}.*pca.rds"))
+  path_to_umap <- str_subset(all_files, glue("{cell_type}.*umap.rds"))
+  path_to_harmony <-str_subset(all_files, glue("{cell_type}.*harmony.rds"))
+  counts <- HDF5Array::HDF5Array(path_to_cts, name = "counts")
+  processed <- HDF5Array::HDF5Array(path_to_processed, name = "processed")
+  row_data <- readRDS(path_to_rowdata)
+  col_data <- readRDS(path_to_coldata)
+  pca <- readRDS(path_to_pca)
+  umap <- readRDS(path_to_umap)
+  harmony <- readRDS(path_to_harmony)
+  sce <- SingleCellExperiment::SingleCellExperiment(
+    assays = list(counts = counts, logcounts = processed),
+    colData = col_data,
+    rowData = row_data
+  )
+  SingleCellExperiment::reducedDims(sce) <- list(
+    PCA = pca,
+    UMAP = umap,
+    HARMONY = harmony
+  )
+  print(sce)
+  #print(scater::plotUMAP(sce, colour_by = "annotation_20220215"))
+  if (class(sce) != "SingleCellExperiment") {
+    stop(glue("The output of {cell_type} is not a SingleCellExperiment!"))
+  }
+}
+```
+
+
+# Session Information
+
+```{r}
+sessionInfo()
+```
+

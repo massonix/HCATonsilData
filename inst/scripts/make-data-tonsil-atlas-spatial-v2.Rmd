@@ -1,0 +1,226 @@
+---
+title: "Download and preprocess the tonsil atlas data (Visium)"
+author: "Ramon Massoni-Badosa, Marc Elosua-Bayes & Helena Lucia Crowell"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(width = 100)
+```
+
+# Introduction
+
+Here we will download and process the Seurat objects associated with the tonsil cell atlas to prepare them for submission to [`ExperimentHub`](https://bioconductor.org/packages/release/bioc/html/ExperimentHub.html). We will follow a similar style and structure as the one used for the [`TabulaMurisSenisData`](https://github.com/fmicompbio/TabulaMurisSenisData) pacakge.
+
+In particular, here we will focus on the [Visium](https://www.10xgenomics.com/products/spatial-gene-expression) data from our tonsil atlas.
+
+# Loading required packages
+
+```{r dependencies}
+library(here)
+library(glue)
+library(Seurat)
+library(HDF5Array)
+library(stringr)
+library(SpatialExperiment)
+library(tools)
+library(dplyr)
+library(readr)
+```
+
+
+# Downloading the Seurat objects from Zenodo
+
+<!--
+The Seurat objects derived from our tonsil atlas have been archived as .rds files in Zenodo under the record [8373756](https://zenodo.org/record/8373756). To generate the URL's for each dataset we used the [zenodo_get](https://github.com/dvolgyes/zenodo_get) package as follows:
+
+```{bash}
+zenodo_get 10.5281/zenodo.8373756 -w tmp.txt
+paste tmp.txt md5sums.txt | sed 's/\t/,/' | sed 's/ \{1,\}/,/g' > tonsil-atlas-zenodo-get-output_v2.csv
+```
+-->
+
+The chunk above was run already to download the scRNA-seq data in another notebook, so we can read the "tonsil-atlas-zenodo-get-output_v2.csv" file and get the URL of the Visium data:
+
+```{r}
+# Read data
+path_to_csv1 <- here("inst/scripts/tonsil-atlas-zenodo-get-output_v2.csv")
+files_df <- read.csv(file = path_to_csv1, header = FALSE)
+colnames(files_df) <- c("url", "file_id", "file_name")
+```
+
+We proceed to download the Visium dataset:
+
+```{r}
+# Create data directories
+data_dir <- here("inst/scripts/spatial_raw_data")
+out_dir <- here("inst/scripts/HCATonsilData/2.0/Spatial")
+dir.create(data_dir, recursive = TRUE, showWarnings = TRUE)
+dir.create(out_dir, recursive = TRUE, showWarnings = TRUE)
+
+
+# Get URL and download
+options(timeout = 1000000)
+filt <- str_detect(files_df$file_name, "Spatial")
+spatial_url <- files_df[filt, "url"]
+out_file <- file.path(
+  data_dir,
+  files_df[filt, "file_name"]
+)
+download.file(url = spatial_url, destfile = out_file)
+
+
+# Check MD5
+md5_original <- files_df[filt, "file_id"]
+md5_download <- md5sum(out_file)
+if (!md5_original == md5_download) {
+  stop("The file is corrupted!")
+}
+
+
+# Uncompress
+untar(out_file, exdir = data_dir)
+```
+
+
+# Process Seurat objects to extract relevant slots
+
+```{r}
+# Read data
+file_path <- here("inst/scripts/spatial_raw_data/spatial_transcriptomics/20220527_tonsil_atlas_spatial_seurat_obj.rds")
+so <- readRDS(file_path)
+
+
+# 'assays'
+for (i in c("counts", "data")) {
+    j <- switch(i, counts="counts", data="logcounts")
+    fnm <- file.path(out_dir, glue("Spatial_assay_{j}.h5"))
+    mtx <- GetAssayData(so, i)
+    h5 <- writeHDF5Array(mtx, 
+        filepath=fnm, name=j, 
+        chunkdim=getHDF5DumpChunkDim(dim(mtx)))
+}
+
+# 'reducedDims'
+for (dr in Reductions(so)) {
+    obj <- Embeddings(so, dr)
+    rownames(obj) <- NULL
+    fnm <- file.path(out_dir, glue("Spatial_dimred_{dr}.rds"))
+    saveRDS(obj, fnm)
+}
+
+
+# 'colData'
+cd <- DataFrame(so@meta.data)
+cd$sample_id <- cd$gem_id # needed for SPE
+saveRDS(cd, file.path(out_dir, "Spatial_coldata.rds"))
+
+
+# 'rowData'
+genes_df <- read_tsv(
+  here("inst/extdata/features.tsv.gz"),
+  col_names = c("ensembl_id", "symbol", "type")
+) %>%
+  filter(type == "Gene Expression") %>%
+  as.data.frame()
+gene_ids <- genes_df$ensembl_id
+names(gene_ids) <- genes_df$symbol
+gs <- rownames(so)
+rd <- so[["Spatial"]]@meta.features
+rd <- DataFrame(row.names=gs, gene_name=gs, rd)
+rd$gene_id <- gene_ids[rd$gene_name]
+names(rd$gene_id) <- NULL
+rd$highly_variable <- gs %in% VariableFeatures(so)
+saveRDS(rd, file.path(out_dir, "Spatial_rowdata.rds"))
+
+# 'imgData'
+id <- lapply(Images(so), \(id) {
+    sfs <- so@images[[id]]@scale.factors
+    img <- GetImage(so, image=id, mode="raster")
+    saveRDS(img, file.path(out_dir, glue("Spatial_image_{id}.rds")))
+    saveRDS(sfs, file.path(out_dir, glue("Spatial_scale_{id}.rds")))
+})
+```
+
+
+# Sanity checks
+
+As a sanity check, let us ensure that we can create successfully each SingleCellExperiment object from its individual slots:
+
+```{r load}
+# metadata
+rd <- readRDS(file.path(out_dir, "Spatial_rowdata.rds"))
+cd <- readRDS(file.path(out_dir, "Spatial_coldata.rds"))
+
+# assays
+as <- list.files(out_dir, "^Spatial_assay_", full.names=TRUE)
+names(as) <- gsub("^Spatial_assay_(.*)\\.h5$", "\\1", basename(as))
+as <- mapply(
+    \(h5, nm) {
+        mtx <- h5read(h5, name=nm)
+        rownames(mtx) <- rd$gene_name
+        colnames(mtx) <- cd$barcode
+        as(mtx, "dgCMatrix")
+    },
+    h5=as, nm=names(as), SIMPLIFY=FALSE)
+
+# reductions
+dr <- list.files(out_dir, "^Spatial_dimred_", full.names=TRUE)
+names(dr) <- toupper(gsub("^Spatial_dimred_(.*)\\.rds", "\\1", basename(dr)))
+dr <- lapply(dr, readRDS)
+
+# images
+id <- lapply(unique(cd$sample_id), \(id) {
+    img <- readRDS(file.path(out_dir, glue("Spatial_image_{id}.rds")))
+    sfs <- readRDS(file.path(out_dir, glue("Spatial_scale_{id}.rds")))
+    DataFrame(
+        sample_id=id, image_id="lowres",
+        data=I(list(SpatialImage(img))), 
+        scaleFactor=sfs$lowres)
+}) |> do.call(what="rbind")
+```
+
+Construct SpatialExperiment object:
+
+```{r spe}
+# construct 'SpatialExperiment'
+(spe <- SpatialExperiment(assays=as, 
+    mainExpName="Spatial",
+    reducedDims=dr, imgData=id,
+    rowData=rd, colData=cd)) #metadata=md
+```
+
+```{r check, warning=FALSE}
+sce_old <- as.SingleCellExperiment(so)
+sce_new <- as(spe, "SingleCellExperiment")
+# drop class-specific identifiers
+sce_old$ident <- sce_new$sample_id <- NULL
+# drop 'spatialCoords'
+int_colData(sce_new)$spatialCoords <- NULL
+# match ordering of reduced dimensions
+drs <- reducedDimNames(sce_old)
+reducedDims(sce_new) <- reducedDims(sce_new)[drs]
+# drop irrelevant internals & dimension names
+imd <- c("version", "mainExpName")
+int_metadata(sce_old) <- int_metadata(sce_old)[imd]
+int_metadata(sce_new) <- int_metadata(sce_new)[imd]
+rownames(colData(sce_old)) <- rownames(colData(sce_new)) <- NULL
+# this is necessary, too...
+elementMetadata(rowRanges(sce_old)) <- elementMetadata(rowRanges(sce_new))
+# check saved & re-loaded objects match
+identical(sce_old, sce_new)
+```
+
+
+# Session Information
+
+```{r session-info}
+sessionInfo()
+```
