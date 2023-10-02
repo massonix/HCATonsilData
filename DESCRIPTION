@@ -26,6 +26,7 @@ RoxygenNote: 7.2.3
 Imports: 
     ExperimentHub,
     SingleCellExperiment,
+    SpatialExperiment,
     HDF5Array,
     SummarizedExperiment,
     htmltools,
@@ -42,6 +43,6 @@ Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://github.com/massonix/HCATonsilData
 BugReports: https://github.com/massonix/HCATonsilData/issues
-biocViews: SingleCellData, ExperimentData, RNASeqData, ExperimentHub, SpatialData
+biocViews: SingleCellData, ExperimentData, RNASeqData, ExperimentHub, ExpressionData, SpatialData
 Depends: 
     R (>= 4.3.0)
