@@ -9,19 +9,12 @@
 #' @examples
 #' listCellTypes(assayType = "RNA")
 #'
-listCellTypes <- function(assayType) {
-  if (assayType == "RNA") {
-    c(
-      "All", "NBC-MBC", "GCBC", "PC","CD4-T", "Th", "CD8-T", "ILC-NK",
-      "myeloid", "FDC", "epithelial", "PDC", "preB", "preT"
-    )
-  } else if (assayType == "ATAC") {
-    c("All", "NBC-MBC", "GCBC", "PC", "CD4-T", "CD8-T", "ILC-NK")
-  } else if (assayType == "CITE") {
-    c("All", "CD4-T")
-  } else if (assayType == "Spatial") {
-    "All"
-  } else {
-    stop("Invalid 'dataset' (must be either 'RNA', 'ATAC', 'CITE' or 'Spatial'")
-  }
+listCellTypes <- function(assayType=c("RNA", "ATAC", "CITE", "Spatial")) {
+  assayType <- match.arg(assayType)
+  switch(assayType,
+        RNA=c("All", "NBC-MBC", "GCBC", "PC","CD4-T", "Th", "CD8-T",
+            "ILC-NK", "myeloid", "FDC", "epithelial", "PDC", "preB", "preT"),
+        ATAC=c("All", "NBC-MBC", "GCBC", "PC", "CD4-T", "CD8-T", "ILC-NK"),
+        CITE=c("All", "CD4-T"),
+        Spatial="All")
 }
