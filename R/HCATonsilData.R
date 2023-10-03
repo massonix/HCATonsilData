@@ -31,20 +31,13 @@
 #'   cellType = "epithelial"
 #' )
 #' sce_epithelial
-HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts = TRUE) {
-  # Sanity checks
-  allowedAssays <- c("RNA", "ATAC", "CITE", "Spatial")
-  if (!(assayType %in% allowedAssays)) {
-    stop(
-      "'assayType' must be included in ",
-      paste(allowedAssays, collapse = ", "))
-  }
-  allowedTypes <- listCellTypes(assayType = assayType)
-  if (!(cellType %in% allowedTypes)) {
-    stop(
-      "'cellType' must be included in ",
-      paste(allowedTypes, collapse = ", "))
-  }
+HCATonsilData <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
+                          cellType = listCellTypes(assayType = assayType),
+                          processedCounts = TRUE) {
+
+  # Check validity of input arguments
+  assayType <- match.arg(assayType)
+  cellType <- match.arg(cellType)
 
   # Initialize ExperimentHub object
   eh <- ExperimentHub::ExperimentHub()
@@ -133,20 +126,12 @@ HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts =
 #'
 #' @examples
 #' HCATonsilDataInfo(assayType = "RNA", cellType = "epithelial")
-HCATonsilDataInfo <- function(assayType = "RNA", cellType = "All") {
-  # Sanity checks
-  allowedAssays <- c("RNA", "ATAC", "CITE", "Spatial")
-  if (!(assayType %in% allowedAssays)) {
-    stop(
-      "'assayType' must be included in ",
-      paste(allowedAssays, collapse = ", "))
-  }
-  allowedTypes <- listCellTypes(assayType = assayType)
-  if (!(cellType %in% allowedTypes)) {
-    stop(
-      "'cellType' must be included in ",
-      paste(allowedTypes, collapse = ", "))
-  }
+HCATonsilDataInfo <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
+                              cellType = listCellTypes(assayType = assayType)) {
+
+  # Check validity of input arguments
+  assayType <- match.arg(assayType)
+  cellType <- match.arg(cellType)
 
   # Initialize ExperimentHub object
   eh <- ExperimentHub::ExperimentHub()
