@@ -59,7 +59,7 @@ test_that("downloading RNA data works", {
 test_that("All cellTypes exist in ExperimentHub", {
   eh <- ExperimentHub::ExperimentHub()
   cellTypes <- HCATonsilData::listCellTypes("RNA")
-  out <- all(sapply(cellTypes, \(.) any(grepl(., eh$rdatapath))))
+  out <- all(vapply(cellTypes, \(.) any(grepl(., eh$rdatapath)), logical(1)))
   expect_true(out)
 })
 

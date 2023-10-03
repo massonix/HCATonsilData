@@ -55,10 +55,10 @@ HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts =
                 "pca.rds", "harmony.rds", "umap.rds")
   names(suffixes) <- c("counts", "processedCounts", "rowData", "colData",
                        "pca", "harmony", "umap")
-  filePaths <- sapply(suffixes, \(.) {
+  filePaths <- vapply(suffixes, \(.) {
     x <- file.path(host, paste(cellType, assayType, ., sep = "_"))
     x
-  })
+  }, character(1))
   for (x in filePaths) {
     if (sum(x == eh$rdatapath) > 1) {
       stop("Input matched more than one entry!")
@@ -157,10 +157,10 @@ HCATonsilDataInfo <- function(assayType = "RNA", cellType = "All") {
                 "pca.rds", "harmony.rds", "umap.rds")
   names(suffixes) <- c("counts", "processedCounts", "rowData", "colData",
                        "pca", "harmony", "umap")
-  filePaths <- sapply(suffixes, \(.) {
+  filePaths <- vapply(suffixes, \(.) {
     x <- file.path(host, paste(cellType, assayType, ., sep = "_"))
     x
-  })
+  }, character(1))
   for (x in filePaths) {
     if (sum(x == eh$rdatapath) > 1) {
       stop("Input matched more than one entry!")
