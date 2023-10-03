@@ -9,6 +9,8 @@ It is inspired in the [TabulaMurisSenisData](https://github.com/fmicompbio/Tabul
 
 ## Installation
 
+HCATonsilData is available in BioConductor and can be installed as follows:
+
 ``` r
 if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
@@ -16,7 +18,7 @@ if (!require("BiocManager", quietly = TRUE))
 BiocManager::install("HCATonsilData")
 ```
 
-Alternatively, you can install it from GitHub using the [devtools](https://github.com/hadley/devtools) package.
+Alternatively, you can install it from GitHub using the [devtools](https://github.com/hadley/devtools) package:
 
 ``` r
 if (!require("devtools", quietly = TRUE))
@@ -27,7 +29,7 @@ devtools::install_github("massonix/HCATonsilData", build_vignettes = TRUE)
 
 ## Documentation
 
-HCATonsilData is a data package, which means that comprehensive documentation is an essential component. This documentation is provided through the package vignette, accessed as follows:
+HCATonsilData is a data package. As such, comprehensive documentation is an essential component of the package, and we provide it through the package vignette:
 
 ``` {r}
 browseVignettes("HCATonsilData")
