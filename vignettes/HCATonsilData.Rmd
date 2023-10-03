@@ -59,9 +59,19 @@ explains in detail the cell- and sample-level metadata, and allows users to
 traceback the annotation of each cell type through an interactive Glossary.
 
 
-# Getting Started
+# Installation
 
-Load the packages in R
+HCATonsilData is available in BioConductor and can be installed as follows:
+
+```{r eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("HCATonsilData")
+```
+
+
+Load the necessary packages in R:
 
 ```{r message=FALSE}
 library(HCATonsilData)
@@ -123,25 +133,7 @@ the combined expression data from scRNA-seq, Multiome and CITE-seq datasets.
 However, we noticed that with CITE-seq we detected 2.75X and 2.98X fewer genes
 than with scRNA-seq and Multiome, respectively:
 
-```{r eval=FALSE, echo=FALSE}
-df <- colData(sce)[, c("assay", "nFeature_RNA")]
-df <- as.data.frame(df)
-# The next object is available here: https://zenodo.org/record/6340174/files/20220215_tonsil_atlas_cite_seurat_obj.rds
-cite <- readRDS("inst/scripts/cite_raw_data/20220215_tonsil_atlas_cite_seurat_obj.rds") 
-cite <- cite@meta.data[, c("assay", "nFeature_RNA")]
-df <- rbind(df, cite)
-df$assay <- factor(df$assay, levels = c("3P", "multiome", "CITE-seq"))
-levels(df$assay) <- c("scRNA-seq", "multiome", "CITE-seq")
-colors <- c("#d52f54", "#4bafdd", "#f0b635")
-names(colors) <- levels(df$assay)
-ggplot(df, aes(assay, nFeature_RNA, fill = assay)) +
-  geom_violin() +
-  stat_summary(fun = "mean", geom = "point", color = "black") +
-  labs(x = "", y = "Number of detected genes") +
-  scale_fill_manual(values = colors, breaks = names(colors)) +
-  theme_classic() +
-  theme(legend.position = "none")
-```
+
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics("tonsil_atlas_n_detected_genes.png")
 ```
@@ -227,12 +219,10 @@ CITE-seq and Spatial.
 We can obtain the `SingleCellExperiment` object with gene expression (RNA)
 data as follows:
 
-```{r eval=FALSE}
+```{r}
 (sce <- HCATonsilData(assayType = "RNA", cellType = "All"))
 table(sce$assay)
-# setting this chunk to eval=FALSE, otherwise the vignette takes too long to compile
 ```
-
 
 As you can see, this object consists of 377,988 profiled with scRNA-seq (3P)
 and 84,364 cells profiled with multiome. We can dowload a `SingleCellExperiment`
