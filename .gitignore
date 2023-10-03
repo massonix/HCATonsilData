@@ -6,6 +6,7 @@ HCATonsilData.Rproj
 .DS_Store
 inst/doc
 inst/scripts/rna_raw_data/*
+inst/scripts/spatial_raw_data/
 inst/scripts/HCATonsilData/*
 inst/scripts/HCATonsilDataRNA/*
 inst/scripts/cite_raw_data/
