@@ -4,13 +4,30 @@ HCATonsilData is an R/ExperimentHub package that provides easy access to single-
 
 ![](inst/images/TonsilAtlasPic.png)
 
-It is inspired in the [TabulaMurisSenisData](https://github.com/fmicompbio/TabulaMurisSenisData/blob/master/README.md) package. For now, it can be installed as follows:
+It is inspired in the [TabulaMurisSenisData](https://github.com/fmicompbio/TabulaMurisSenisData/blob/master/README.md) package
 
-``` {r}
+
+## Installation
+
+``` r
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("HCATonsilData")
+```
+
+Alternatively, you can install it from GitHub using the [devtools](https://github.com/hadley/devtools) package.
+
+``` r
+if (!require("devtools", quietly = TRUE))
+    install.packages("devtools")
+
 devtools::install_github("massonix/HCATonsilData", build_vignettes = TRUE)
 ```
 
-This will compile a vignette which documents the whole dataset:
+## Documentation
+
+HCATonsilData is a data package, which means that comprehensive documentation is an essential component. This documentation is provided through the package vignette, accessed as follows:
 
 ``` {r}
 browseVignettes("HCATonsilData")
