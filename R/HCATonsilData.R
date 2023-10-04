@@ -55,7 +55,7 @@ HCATonsilData <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
       "data",
       sep = " "
     ))
-    browseVignettes("HCATonsilData")
+    print("Please run browseVignettes('HCATonsilData')")
   }
 
   # Download scRNA-seq data and return a SingleCellExperiment if assay is RNA

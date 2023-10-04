@@ -20,8 +20,6 @@
 #' @source \url{https://zenodo.org/record/8373756}
 #' @name NBC_MBC_annotation_df
 #' @docType data
-NULL
-
 globalVariables("NBC_MBC_annotation_df")
 
 
@@ -42,8 +40,6 @@ globalVariables("NBC_MBC_annotation_df")
 #' "inst/scripts/make-annotation-dictionary.R
 #' @name annotation_dictionary
 #' @docType data
-NULL
-
 globalVariables("annotation_dictionary")
 
 
@@ -58,8 +54,6 @@ globalVariables("annotation_dictionary")
 #' @source Check the tonsil atlas publication
 #' @name donor_metadata
 #' @docType data
-NULL
-
 globalVariables("donor_metadata")
 
 
@@ -67,12 +61,11 @@ globalVariables("donor_metadata")
 #' 
 #' Color palettes used in the paper for all cell types
 #' 
+#' 
 #' @format A list with the HEX color codes for each cell type
 #' 
 #' @source This file was created with the script in
 #' "inst/scripts/make-annotation-colors.R
 #' @name colors_20230508
 #' @docType data
-NULL
-
 globalVariables("colors_20230508")

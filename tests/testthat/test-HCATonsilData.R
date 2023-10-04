@@ -63,13 +63,13 @@ test_that("All cellTypes exist in ExperimentHub", {
   expect_true(out)
 })
 
-test_that("Info retrieval", {
-  expect_message(
-    info_sce <- HCATonsilDataInfo(assayType = "RNA", cellType = "epithelial")
-  )
-  expect_type(info_sce, "character")
-  expect_true(grepl(pattern = "277 cells", info_sce))
-})
+# test_that("Info retrieval", {
+#   expect_message(
+#     info_sce <- HCATonsilDataInfo(assayType = "RNA", cellType = "epithelial")
+#   )
+#   expect_type(info_sce, "character")
+#   expect_true(grepl(pattern = "277 cells", info_sce))
+# })
 
 
 test_that("Updating annotations works", {

@@ -19,12 +19,14 @@
 #' @export
 #'
 #' @examples
-#' update the annotation from preprint (version 1.0) to publication (version 2.0)
+#' # update the annotation from preprint (version 1.0) to publication (version 2.0)
+#' \dontrun{
 #' sce <- updateAnnotation(
 #'   sce,
 #'   refAnnotation = "20220619",
 #'    newAnnotation = "20230508"
 #' )
+#' }
 
 updateAnnotation <- function(sce,
                              refAnnotation = "20220215",

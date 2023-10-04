@@ -231,7 +231,7 @@ TODO: include spatial and Rna=All downloads, but with eval=FALSE
 We can obtain the `SingleCellExperiment` object with gene expression (RNA)
 data as follows:
 
-```{r}
+```{r eval=FALSE}
 (sce <- HCATonsilData(assayType = "RNA", cellType = "All"))
 table(sce$assay)
 ```
@@ -243,18 +243,18 @@ object specific to each of the main subpopulations defined at level 1 as follows
 ```{r}
 listCellTypes(assayType = "RNA")
 (epithelial <- HCATonsilData(assayType = "RNA", cellType = "epithelial"))
-df <- as.data.frame(colData(epithelial))
-ggplot(df, aes(UMAP_1_20220215, UMAP_2_20220215, col = annotation_20230508)) +
-  geom_point() +
-  scale_color_manual(values = cols) +
-  labs(title = "Annotation 20230508", x = "UMAP1", y = "UMAP2") +
-  theme_classic() +
-  theme(
-    plot.title = element_text(hjust = 0.5),
-    legend.title = element_blank(),
-    axis.text = element_blank(),
-    axis.ticks = element_blank()
-  )
+# df <- as.data.frame(colData(epithelial))
+# ggplot(df, aes(UMAP_1_20220215, UMAP_2_20220215, col = annotation_20230508)) +
+#   geom_point() +
+#   scale_color_manual(values = cols) +
+#   labs(title = "Annotation 20230508", x = "UMAP1", y = "UMAP2") +
+#   theme_classic() +
+#   theme(
+#     plot.title = element_text(hjust = 0.5),
+#     legend.title = element_blank(),
+#     axis.text = element_blank(),
+#     axis.ticks = element_blank()
+#   )
 ```
 
 As we can see, the annotation we are currently using has a date associated with
@@ -416,7 +416,7 @@ scirpy_df <- read.csv(
 Coming soon! (TODO) For now you can download the original `Seurat` object with the
 following code:
 
-```{r}
+```{r eval=FALSE}
 (spatial <- HCATonsilData(assayType = "Spatial"))
 
 # TODO Helena: Document basic slots of SpatialExperiment object
@@ -432,7 +432,7 @@ Coming soon! (TODO)
 
 Yadda yadda TODO, one can read up info on this in two different manners
 
-```{r eval = TRUE}
+```{r eval = FALSE}
 library("HCATonsilData")
 
 head(TonsilData_glossary())
@@ -441,7 +441,7 @@ TonsilData_cellinfo("Th17")
 ```
 
 
-```{r eval = TRUE}
+```{r eval = FALSE}
 htmltools::includeHTML(
   TonsilData_cellinfo_html("Th17", display_plot = TRUE)
 )
