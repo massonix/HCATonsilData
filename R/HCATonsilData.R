@@ -24,6 +24,7 @@
 #' @importFrom HDF5Array HDF5Array
 #' @importFrom SingleCellExperiment SingleCellExperiment reducedDim reducedDim<-
 #'   reducedDims
+#' @importFrom SpatialExperiment SpatialExperiment SpatialImage
 #' @importFrom SummarizedExperiment assay
 #' @export
 #'
@@ -127,70 +128,138 @@ HCATonsilData <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
       if (cellType == "All") {
         annot <- sce$annotation_20220619
         names(annot) <- colnames(sce)
-        annot[NBC_MBC_annotation_df$barcode] <- NBC_MBC_annotation_df$annotation_20220619
+        annot[HCATonsilData::NBC_MBC_annotation_df$barcode] <- HCATonsilData::NBC_MBC_annotation_df$annotation_20220619
         sce$annotation_20220619 <- annot
       }
     }
-
-    # Return
-    return(sce)
   }
-}
-
-#' Information on the Tonsil Data
-#'
-#' Get information on the individual datasets of the Tonsil Atlas data
-#'
-#' @inheritParams HCATonsilData
-#'
-#' @return An info message is generated, and its content is returned invisibly.
-#'
-#' @author Federico Marini
-
-#' @export
-#'
-#' @examples
-#' HCATonsilDataInfo(assayType = "RNA", cellType = "epithelial")
-HCATonsilDataInfo <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
-                              cellType = listCellTypes(assayType = assayType)) {
-
-  # Check validity of input arguments
-  assayType <- match.arg(assayType)
-  cellType <- match.arg(cellType)
-
-  # Initialize ExperimentHub object
-  eh <- ExperimentHub::ExperimentHub()
-  host <- file.path("HCATonsilData", "1.0", assayType)
-
-  # Define paths
-  suffixes <- c("counts.h5", "processed.h5", "rowdata.rds", "coldata.rds",
-                "pca.rds", "harmony.rds", "umap.rds")
-  names(suffixes) <- c("counts", "processedCounts", "rowData", "colData",
-                       "pca", "harmony", "umap")
-  filePaths <- vapply(suffixes, \(.) {
-    x <- file.path(host, paste(cellType, assayType, ., sep = "_"))
-    x
-  }, character(1))
-  for (x in filePaths) {
-    if (sum(x == eh$rdatapath) > 1) {
-      stop("Input matched more than one entry!")
+    
+  # Get Visium data and return SpatialExperiment if assaytype is Spatial
+  if (assayType == "Spatial") {
+    if (version == "1.0") {
+      stop("Spatial transcriptomics data is only available for version 2.0")
     }
+    
+    # Initialize ExperimentHub object
+    eh <- ExperimentHub::ExperimentHub()
+    host <- file.path("HCATonsilData", version, assayType)
+    
+    # Get raw and processed counts
+    cts <- HDF5Array::HDF5Array(
+      eh[eh$rdatapath == file.path(host, "Spatial_assay_counts.h5")][[1]],
+      name = "counts"
+    )
+    as <- list(counts = cts)
+    if (processedCounts) {
+      prccts <- HDF5Array::HDF5Array(
+        eh[eh$rdatapath == file.path(host, "Spatial_assay_logcounts.h5")][[1]],
+        name = "logcounts"
+      )
+      as[["logcounts"]] <- prccts
+    }
+    
+    # Get dimensionality reductions
+    dr_filt <- grepl(file.path(host, "Spatial_dimred"), eh$rdatapath)
+    dr_paths <- eh$rdatapath[dr_filt]
+    names(dr_paths) <- sub(".*/Spatial_dimred_(\\w+)\\.rds", "\\1", dr_paths)
+    dr <- lapply(dr_paths, \(x) eh[eh$rdatapath == x][[1]])
+    names(dr) <- toupper(names(dr))
+    
+    # Get cell and gene metadata
+    rowdata <- eh[eh$rdatapath == file.path(host, "Spatial_rowdata.rds")][[1]]
+    coldata <- eh[eh$rdatapath == file.path(host, "Spatial_coldata.rds")][[1]]
+    
+    # Get images
+    img_filt <- grepl(file.path(host, "Spatial_image"), eh$rdatapath)
+    sfs_filt <- grepl(file.path(host, "Spatial_scale"), eh$rdatapath)
+    img_paths <- eh$rdatapath[img_filt]
+    sfs_paths <- eh$rdatapath[sfs_filt]
+    names(img_paths) <- sub(".*/Spatial_image_(\\w+)\\.rds", "\\1", img_paths)
+    names(sfs_paths) <- sub(".*/Spatial_scale_(\\w+)\\.rds", "\\1", sfs_paths)
+    sfs_paths <- sfs_paths[names(img_paths)] # ensure images and scale are ordered equally
+    images <- mapply(\(img_path, sfs_path, nm) {
+      img <- eh[eh$rdatapath == img_path][[1]]
+      sfs <- eh[eh$rdatapath == sfs_path][[1]]
+      df <- DataFrame(
+        sample_id = nm,
+        image_id = "lowres",
+        data = I(list(SpatialImage(img))),
+        scaleFactor = sfs$lowres
+      )
+      df
+    }, img_path=img_paths, sfs_path = sfs_paths, nm=names(img_paths), SIMPLIFY = TRUE)
+    images <- do.call(rbind, images)
+
+    # Create SpatialExperiment object
+    sce <- SpatialExperiment(
+      assays = as,
+      mainExpName = "Spatial",
+      reducedDims = dr,
+      imgData = images,
+      rowData = rowdata,
+      colData = coldata
+    )
   }
 
-  # Fetch info instead of creating full sce object
-  rd_sce <- eh[eh$rdatapath == filePaths["rowData"]][[1]]
-  cd_sce <- eh[eh$rdatapath == filePaths["colData"]][[1]]
-
-  # buildup the information string
-  info_sce <- sprintf(
-    "Dataset: %s (assay selected: %s)\nMeasurements available for %d genes in %d cells",
-    cellType,
-    assayType,
-    nrow(rd_sce),
-    nrow(cd_sce)
-  )
-
-  message(info_sce)
-
-  return(invisible(info_sce))
+  # Return
+  return(sce)
 }
+
+
+#' #' Information on the Tonsil Data
+#' #'
+#' #' Get information on the individual datasets of the Tonsil Atlas data
+#' #'
+#' #' @inheritParams HCATonsilData
+#' #'
+#' #' @return An info message is generated, and its content is returned invisibly.
+#' #'
+#' #' @author Federico Marini
+#' 
+#' #' @export
+#' #'
+#' #' @examples
+#' #' HCATonsilDataInfo(assayType = "RNA", cellType = "epithelial")
+#' HCATonsilDataInfo <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
+#'                               cellType = listCellTypes(assayType = assayType)) {
+#' 
+#'   # Check validity of input arguments
+#'   assayType <- match.arg(assayType)
+#'   cellType <- match.arg(cellType)
+#' 
+#'   # Initialize ExperimentHub object
+#'   eh <- ExperimentHub::ExperimentHub()
+#'   host <- file.path("HCATonsilData", "1.0", assayType)
+#' 
+#'   # Define paths
+#'   suffixes <- c("counts.h5", "processed.h5", "rowdata.rds", "coldata.rds",
+#'                 "pca.rds", "harmony.rds", "umap.rds")
+#'   names(suffixes) <- c("counts", "processedCounts", "rowData", "colData",
+#'                        "pca", "harmony", "umap")
+#'   filePaths <- vapply(suffixes, \(.) {
+#'     x <- file.path(host, paste(cellType, assayType, ., sep = "_"))
+#'     x
+#'   }, character(1))
+#'   for (x in filePaths) {
+#'     if (sum(x == eh$rdatapath) > 1) {
+#'       stop("Input matched more than one entry!")
+#'     }
+#'   }
+#' 
+#'   # Fetch info instead of creating full sce object
+#'   rd_sce <- eh[eh$rdatapath == filePaths["rowData"]][[1]]
+#'   cd_sce <- eh[eh$rdatapath == filePaths["colData"]][[1]]
+#' 
+#'   # buildup the information string
+#'   info_sce <- sprintf(
+#'     "Dataset: %s (assay selected: %s)\nMeasurements available for %d genes in %d cells",
+#'     cellType,
+#'     assayType,
+#'     nrow(rd_sce),
+#'     nrow(cd_sce)
+#'   )
+#' 
+#'   message(info_sce)
+#' 
+#'   return(invisible(info_sce))
+#' }
