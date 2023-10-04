@@ -17,16 +17,22 @@ reference.}
 (annotation_*).}
 }
 \value{
-A SingleCellExperiment object with additional columns
+A SingleCellExperiment object with additional an additional column
 (annotation_*) that contains more annotations.
 }
 \description{
-Annotations are dynamic by nature. As more eyes look into the data and
+Annotations are dynamic by nature. As more experts look into the data and
 newer literature comes out, we expect annotations to be refined over time.
-We have accommodated this by allowing us and users to add newer annotations
-to the SingleCellExperiment objects.
+We have accommodated this by allowing us and users to add new annotations
+to the SingleCellExperiment objects. If you want to propose a new
+annotation based on your experience or new evidence, please open an issue
+at https://github.com/massonix/HCATonsilData/issues.
 }
 \examples{
-# TODO - Ramon
-NULL
+update the annotation from preprint (version 1.0) to publication (version 2.0)
+sce <- updateAnnotation(
+  sce,
+  refAnnotation = "20220619",
+   newAnnotation = "20230508"
+)
 }

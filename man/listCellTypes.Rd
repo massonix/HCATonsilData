@@ -4,10 +4,17 @@
 \alias{listCellTypes}
 \title{List available cell types for a dataset of the tonsil cell atlas}
 \usage{
-listCellTypes(assayType)
+listCellTypes(
+  assayType = c("RNA", "ATAC", "Multiome", "CITE", "Spatial"),
+  version = "2.0"
+)
 }
 \arguments{
-\item{assayType}{Either 'RNA', 'ATAC', 'CITE', or 'Spatial'}
+\item{assayType}{Either 'RNA', 'ATAC', 'Multiome', 'CITE', or 'Spatial'}
+
+\item{version}{Version of the tonsil atlas data: '1.0' (preprint) or '2.0'
+or '2.0' (publication, default). Note that, for version 2.0, CD8-T and
+ILC-NK are combined in a single 'Cytotoxic' object.}
 }
 \value{
 A character vector with the available cell types for the indicated
@@ -17,6 +24,6 @@ dataset.
 List available cell types for a dataset of the tonsil cell atlas
 }
 \examples{
-listCellTypes(assayType = "RNA")
+listCellTypes(assayType = "RNA", version = "2.0")
 
 }
