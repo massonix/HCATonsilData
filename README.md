@@ -15,7 +15,7 @@ The preprint was published in June 2022:
 And the final paper was accepted in September 2023, so we expect it to be published
 December of this year.
 
-![](inst/images/TonsilAtlasPic.png)
+![](inst/images/graphical_abstract.png)
 
 
 
