@@ -2,28 +2,37 @@
 % Please edit documentation in R/HCATonsilData.R
 \name{HCATonsilData}
 \alias{HCATonsilData}
-\title{Access the Tonsil Atlas data (RNA, ATAC, CITE, Spatial)}
+\title{Access the Tonsil Atlas data (RNA, ATAC, Multiome, CITE, Spatial)}
 \usage{
-HCATonsilData(assayType = "RNA", cellType = "All", processedCounts = TRUE)
+HCATonsilData(
+  assayType = c("RNA", "ATAC", "CITE", "Spatial"),
+  cellType = "All",
+  version = "2.0",
+  processedCounts = TRUE
+)
 }
 \arguments{
-\item{assayType}{One of "RNA", "ATAC", "CITE" or "Spatial".}
+\item{assayType}{One of 'RNA', 'ATAC', 'Multiome', 'CITE' or 'Spatial'.}
 
-\item{cellType}{A character vector with the cell type available.
+\item{cellType}{A character vector of length 1 with the desired cell type.
 A list of available cell types can be obtained using
 \code{listCellTypes(assay_type)}.}
 
+\item{version}{Version of the tonsil atlas data to retrieve: "1.0" (preprint)
+or "2.0" (publication, default)}
+
 \item{processedCounts}{Logical scalar. If \code{TRUE}, include the processed
-counts in addition to the raw counts in the SingleCellExperiment object.}
+(normalized) counts in addition to the raw counts in the
+SingleCellExperiment object.}
 }
 \value{
-A named list of
-\linkS4class{SingleCellExperiment} objects (one per cell_type requested
-via \code{cell_type})
+A \linkS4class{SingleCellExperiment} object for the cellType
+requested. For scATAC-seq, Multiome and CITE we provide the instructions
+for downloading the Seurat objects in Zenodo (see vignette)
 }
 \description{
 The data was downloaded from Zenodo
-https://zenodo.org/record/6340174#.YkwQwX9BxH4
+https://zenodo.org/record/8373756
 }
 \examples{
 # retrieve the epithelial scRNA-seq dataset

@@ -4,12 +4,15 @@
 \alias{HCATonsilDataInfo}
 \title{Information on the Tonsil Data}
 \usage{
-HCATonsilDataInfo(assayType = "RNA", cellType = "All")
+HCATonsilDataInfo(
+  assayType = c("RNA", "ATAC", "CITE", "Spatial"),
+  cellType = listCellTypes(assayType = assayType)
+)
 }
 \arguments{
-\item{assayType}{One of "RNA", "ATAC", "CITE" or "Spatial".}
+\item{assayType}{One of 'RNA', 'ATAC', 'Multiome', 'CITE' or 'Spatial'.}
 
-\item{cellType}{A character vector with the cell type available.
+\item{cellType}{A character vector of length 1 with the desired cell type.
 A list of available cell types can be obtained using
 \code{listCellTypes(assay_type)}.}
 }
