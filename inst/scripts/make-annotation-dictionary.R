@@ -2,7 +2,7 @@
 # and saves a dictionary to be used in the updateAnnotations function
 
 annotations_dictionary <- list(
-  dict_20220215_to_20220619 <- c(
+  dict_20220215_to_20220619 = c(
     # MBC
     "MBC-like_nonproli" = "Precursor MBCs",
     "MBC-like_proli1" = "Precursor MBCs",
@@ -47,7 +47,7 @@ annotations_dictionary <- list(
     "ITGAX ZEB2 macrophages" = "ITGAX Slancytes",
     "Mast cells" = "Mast"
   ),
-  dict_20220619_to_20230508 <- c(
+  dict_20220619_to_20230508 = c(
     # Unconventional CD8 T cells
     "MAIT" = "MAIT/Vδ2+ γδ T",
     "TCRVδ+ gd T" = "non-Vδ2+ γδ T",

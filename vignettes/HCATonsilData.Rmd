@@ -216,6 +216,12 @@ CITE-seq and Spatial.
 
 ## RNA
 
+TODO: mention HCATonsilDataInfo, describe that the first time the dataset is downloaded might take longer (depending on size of tha dataset), but once it's downloaded HCATonsilAtlas will upload it from cache instead, speededing up things.
+
+TODO: mention color palettes, same as in paper
+
+TODO: mention timestamped annotation. open an issue if needed
+
 We can obtain the `SingleCellExperiment` object with gene expression (RNA)
 data as follows:
 
