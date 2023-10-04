@@ -31,20 +31,13 @@
 #'   cellType = "epithelial"
 #' )
 #' sce_epithelial
-HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts = TRUE) {
-  # Sanity checks
-  allowedAssays <- c("RNA", "ATAC", "CITE", "Spatial")
-  if (!(assayType %in% allowedAssays)) {
-    stop(
-      "'assayType' must be included in ",
-      paste(allowedAssays, collapse = ", "))
-  }
-  allowedTypes <- listCellTypes(assayType = assayType)
-  if (!(cellType %in% allowedTypes)) {
-    stop(
-      "'cellType' must be included in ",
-      paste(allowedTypes, collapse = ", "))
-  }
+HCATonsilData <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
+                          cellType = listCellTypes(assayType = assayType),
+                          processedCounts = TRUE) {
+
+  # Check validity of input arguments
+  assayType <- match.arg(assayType)
+  cellType <- match.arg(cellType)
 
   # Initialize ExperimentHub object
   eh <- ExperimentHub::ExperimentHub()
@@ -55,10 +48,10 @@ HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts =
                 "pca.rds", "harmony.rds", "umap.rds")
   names(suffixes) <- c("counts", "processedCounts", "rowData", "colData",
                        "pca", "harmony", "umap")
-  filePaths <- sapply(suffixes, \(.) {
+  filePaths <- vapply(suffixes, \(.) {
     x <- file.path(host, paste(cellType, assayType, ., sep = "_"))
     x
-  })
+  }, character(1))
   for (x in filePaths) {
     if (sum(x == eh$rdatapath) > 1) {
       stop("Input matched more than one entry!")
@@ -133,20 +126,12 @@ HCATonsilData <- function(assayType = "RNA", cellType = "All", processedCounts =
 #'
 #' @examples
 #' HCATonsilDataInfo(assayType = "RNA", cellType = "epithelial")
-HCATonsilDataInfo <- function(assayType = "RNA", cellType = "All") {
-  # Sanity checks
-  allowedAssays <- c("RNA", "ATAC", "CITE", "Spatial")
-  if (!(assayType %in% allowedAssays)) {
-    stop(
-      "'assayType' must be included in ",
-      paste(allowedAssays, collapse = ", "))
-  }
-  allowedTypes <- listCellTypes(assayType = assayType)
-  if (!(cellType %in% allowedTypes)) {
-    stop(
-      "'cellType' must be included in ",
-      paste(allowedTypes, collapse = ", "))
-  }
+HCATonsilDataInfo <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
+                              cellType = listCellTypes(assayType = assayType)) {
+
+  # Check validity of input arguments
+  assayType <- match.arg(assayType)
+  cellType <- match.arg(cellType)
 
   # Initialize ExperimentHub object
   eh <- ExperimentHub::ExperimentHub()
@@ -157,10 +142,10 @@ HCATonsilDataInfo <- function(assayType = "RNA", cellType = "All") {
                 "pca.rds", "harmony.rds", "umap.rds")
   names(suffixes) <- c("counts", "processedCounts", "rowData", "colData",
                        "pca", "harmony", "umap")
-  filePaths <- sapply(suffixes, \(.) {
+  filePaths <- vapply(suffixes, \(.) {
     x <- file.path(host, paste(cellType, assayType, ., sep = "_"))
     x
-  })
+  }, character(1))
   for (x in filePaths) {
     if (sum(x == eh$rdatapath) > 1) {
       stop("Input matched more than one entry!")
