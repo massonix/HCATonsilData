@@ -169,7 +169,7 @@ Alternatively, you can get a static html with links to markers and articles with
 TonsilData_cellinfo_html("Tfr")
 ```
 
-![](HCATonsilData/vignettes/tfr_glossary.png)
+![](vignettes/tfr_glossary.png)
 
 Although we have put massive effort in annotating tonsillar cell types, cell type
 annotations are dynamic by nature. New literature or other interpretations of the
