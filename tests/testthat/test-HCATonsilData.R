@@ -1,3 +1,4 @@
+data("annotations_dictionary")
 test_that("downloading RNA data works for both versions", {
   # Version 1
   sce_v1 <- HCATonsilData(
