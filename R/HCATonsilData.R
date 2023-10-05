@@ -22,6 +22,7 @@
 #'
 #' @importFrom ExperimentHub ExperimentHub
 #' @importFrom HDF5Array HDF5Array
+#' @importFrom S4Vectors DataFrame
 #' @importFrom SingleCellExperiment SingleCellExperiment reducedDim reducedDim<-
 #'   reducedDims
 #' @importFrom SpatialExperiment SpatialExperiment SpatialImage
@@ -105,45 +106,45 @@ HCATonsilData <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
       )
       SummarizedExperiment::assay(sce, "logcounts", withDimnames = FALSE) <- prccts
     }
-    
+
     if (version == "1.0") {
       # Update annotations
       sce <- updateAnnotation(sce = sce, "20220215", "20220619")
       sce <- updateAnnotation(sce = sce, "20220619", "20230508")
-  
+
       # For NBC-MBC, we reclustered them from 20220215 to 20220619, which means
       # that there is not a 1:1 mapping between annotations. Let us reannotate
       # using a pre-loaded dataframe. Also, let's change the UMAP coords
       # to match the paper
       if (cellType == "NBC-MBC") {
         sce <- sce[, NBC_MBC_annotation_df$barcode]
-        sce$annotation_20220619 <- HCATonsilData::NBC_MBC_annotation_df$annotation_20220619
+        sce$annotation_20220619 <- NBC_MBC_annotation_df$annotation_20220619
         umap_df <- as.matrix(
-          HCATonsilData::NBC_MBC_annotation_df[, c("UMAP_1", "UMAP_2")]
+          NBC_MBC_annotation_df[, c("UMAP_1", "UMAP_2")]
         )
         reducedDim(sce, "UMAP") <- umap_df
       }
-  
+
       # Similarly, let us update NBC/MBC annotation in case cellType = All
       if (cellType == "All") {
         annot <- sce$annotation_20220619
         names(annot) <- colnames(sce)
-        annot[HCATonsilData::NBC_MBC_annotation_df$barcode] <- HCATonsilData::NBC_MBC_annotation_df$annotation_20220619
+        annot[NBC_MBC_annotation_df$barcode] <- NBC_MBC_annotation_df$annotation_20220619
         sce$annotation_20220619 <- annot
       }
     }
   }
-    
+
   # Get Visium data and return SpatialExperiment if assaytype is Spatial
   if (assayType == "Spatial") {
     if (version == "1.0") {
       stop("Spatial transcriptomics data is only available for version 2.0")
     }
-    
+
     # Initialize ExperimentHub object
     eh <- ExperimentHub::ExperimentHub()
     host <- file.path("HCATonsilData", version, assayType)
-    
+
     # Get raw and processed counts
     cts <- HDF5Array::HDF5Array(
       eh[eh$rdatapath == file.path(host, "Spatial_assay_counts.h5")][[1]],
@@ -157,18 +158,18 @@ HCATonsilData <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
       )
       as[["logcounts"]] <- prccts
     }
-    
+
     # Get dimensionality reductions
     dr_filt <- grepl(file.path(host, "Spatial_dimred"), eh$rdatapath)
     dr_paths <- eh$rdatapath[dr_filt]
     names(dr_paths) <- sub(".*/Spatial_dimred_(\\w+)\\.rds", "\\1", dr_paths)
     dr <- lapply(dr_paths, \(x) eh[eh$rdatapath == x][[1]])
     names(dr) <- toupper(names(dr))
-    
+
     # Get cell and gene metadata
     rowdata <- eh[eh$rdatapath == file.path(host, "Spatial_rowdata.rds")][[1]]
     coldata <- eh[eh$rdatapath == file.path(host, "Spatial_coldata.rds")][[1]]
-    
+
     # Get images
     img_filt <- grepl(file.path(host, "Spatial_image"), eh$rdatapath)
     sfs_filt <- grepl(file.path(host, "Spatial_scale"), eh$rdatapath)
@@ -215,22 +216,22 @@ HCATonsilData <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
 #' #' @return An info message is generated, and its content is returned invisibly.
 #' #'
 #' #' @author Federico Marini
-#' 
+#'
 #' #' @export
 #' #'
 #' #' @examples
 #' #' HCATonsilDataInfo(assayType = "RNA", cellType = "epithelial")
 #' HCATonsilDataInfo <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
 #'                               cellType = listCellTypes(assayType = assayType)) {
-#' 
+#'
 #'   # Check validity of input arguments
 #'   assayType <- match.arg(assayType)
 #'   cellType <- match.arg(cellType)
-#' 
+#'
 #'   # Initialize ExperimentHub object
 #'   eh <- ExperimentHub::ExperimentHub()
 #'   host <- file.path("HCATonsilData", "1.0", assayType)
-#' 
+#'
 #'   # Define paths
 #'   suffixes <- c("counts.h5", "processed.h5", "rowdata.rds", "coldata.rds",
 #'                 "pca.rds", "harmony.rds", "umap.rds")
@@ -245,11 +246,11 @@ HCATonsilData <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
 #'       stop("Input matched more than one entry!")
 #'     }
 #'   }
-#' 
+#'
 #'   # Fetch info instead of creating full sce object
 #'   rd_sce <- eh[eh$rdatapath == filePaths["rowData"]][[1]]
 #'   cd_sce <- eh[eh$rdatapath == filePaths["colData"]][[1]]
-#' 
+#'
 #'   # buildup the information string
 #'   info_sce <- sprintf(
 #'     "Dataset: %s (assay selected: %s)\nMeasurements available for %d genes in %d cells",
@@ -258,8 +259,8 @@ HCATonsilData <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
 #'     nrow(rd_sce),
 #'     nrow(cd_sce)
 #'   )
-#' 
+#'
 #'   message(info_sce)
-#' 
+#'
 #'   return(invisible(info_sce))
 #' }
