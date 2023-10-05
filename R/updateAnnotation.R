@@ -24,17 +24,16 @@
 #' sce <- updateAnnotation(
 #'   sce,
 #'   refAnnotation = "20220619",
-#'    newAnnotation = "20230508"
+#'   newAnnotation = "20230508"
 #' )
 #' }
-
 updateAnnotation <- function(sce,
                              refAnnotation = "20220215",
                              newAnnotation = "20220619") {
   oldAnnot <- paste("annotation", refAnnotation, sep = "_")
   newAnnot <- paste("annotation", newAnnotation, sep = "_")
   selectedDict <- paste0("dict_", refAnnotation, "_to_", newAnnotation)
-  selectedDict <- HCATonsilData::annotations_dictionary[[selectedDict]]
+  selectedDict <- annotations_dictionary[[selectedDict]]
   sce[[newAnnot]] <- as.character(sce[[oldAnnot]])
   selectedDict <- selectedDict[names(selectedDict) %in% unique(sce[[oldAnnot]])]
   for (cellType in names(selectedDict)) {
@@ -42,3 +41,6 @@ updateAnnotation <- function(sce,
   }
   sce
 }
+
+globalVariables("annotations_dictionary")
+
