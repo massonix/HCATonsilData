@@ -25,8 +25,8 @@ globalVariables("NBC_MBC_annotation_df")
 
 
 #' Annotation dictionary to keep track of annotations changes and versions
-#' 
-#' Annotations are opinionated and dynamic by nature. They are subjected to 
+#'
+#' Annotations are opinionated and dynamic by nature. They are subjected to
 #' change as more experts look into the data and more evidence is published.
 #' HCATonsilData has been designed to account for that. We timestamp annotations
 #' and plan to include additional annotations if users propose them and we
@@ -38,16 +38,15 @@ globalVariables("NBC_MBC_annotation_df")
 #'
 #' @source This file was created with the script in
 #' "inst/scripts/make-annotation-dictionary.R
-#' @name annotation_dictionary
+#' @name annotations_dictionary
 #' @docType data
-globalVariables("annotation_dictionary")
-
+globalVariables("annotations_dictionary")
 
 #' Donor metadata
-#' 
+#'
 #' Data frame that contains all metadata information for the 17 donors included
 #' in the tonsil atlas.
-#' 
+#'
 #'
 #' @format A dataframe with 17 observations and 8 variables
 #'
@@ -58,12 +57,12 @@ globalVariables("donor_metadata")
 
 
 #' Color palettes
-#' 
+#'
 #' Color palettes used in the paper for all cell types
-#' 
-#' 
+#'
+#'
 #' @format A list with the HEX color codes for each cell type
-#' 
+#'
 #' @source This file was created with the script in
 #' "inst/scripts/make-annotation-colors.R
 #' @name colors_20230508

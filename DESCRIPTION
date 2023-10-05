@@ -29,6 +29,7 @@ Imports:
     SpatialExperiment,
     HDF5Array,
     SummarizedExperiment,
+    S4Vectors,
     htmltools,
     rmarkdown,
     base64enc,
