@@ -95,6 +95,8 @@ which we used to validate the presence, annotation and markers of the discovered
 cell types. The following table corresponds to the donor-level metadata:
 
 ```{r}
+data("donor_metadata")
+
 kable(
   donor_metadata,
   format = "markdown",
