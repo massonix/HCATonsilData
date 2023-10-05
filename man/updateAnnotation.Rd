@@ -34,7 +34,7 @@ at https://github.com/massonix/HCATonsilData/issues.
 sce <- updateAnnotation(
   sce,
   refAnnotation = "20220619",
-   newAnnotation = "20230508"
+  newAnnotation = "20230508"
 )
 }
 }
