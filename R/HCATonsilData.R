@@ -73,10 +73,10 @@ HCATonsilData <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
     names(filePaths) <- names(suffixes)
     for (x in filePaths) {
       if (sum(x == eh$rdatapath) > 1) {
-        stop(paste0(x, " matched more than one entry!"))
+        stop(x, " matched more than one entry!")
       }
       if (sum(x == eh$rdatapath) == 0) {
-        stop(paste0(x, " is not present in ExperimentHub!"))
+        stop(x, " is not present in ExperimentHub!")
       }
     }
 
