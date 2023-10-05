@@ -415,6 +415,20 @@ library("SpatialExperiment")
 ```
 
 
+To plot gene expression you can use the ggspavis package:
+
+```{r eval=FALSE}
+library(ggspavis)
+sub <- spe[, spe$sample_id == "esvq52_nluss5"]
+plt <- plotVisium(sub, fill="SELENOP") + 
+  scale_fill_gradientn(colors=rev(hcl.colors(9, "Spectral")))
+plt$layers[[2]]$aes_params$size <- 1.5
+plt$layers[[2]]$aes_params$alpha <- 1
+plt$layers[[2]]$aes_params$stroke <- NA
+plt
+```
+
+
 # Annotations
 
 To allow users to traceback the rationale behind each and every of our annotations,
