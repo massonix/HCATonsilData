@@ -56,7 +56,7 @@ datasets of the different modalities and cell types of the tonsil atlas.
 HCATonsilData also documents how the dataset was generated and archived in
 different repositories, from raw fastq files to processed datasets. It also
 explains in detail the cell- and sample-level metadata, and allows users to
-traceback the annotation of each cell type through an interactive Glossary.
+traceback the annotation of each cell type through detailed Glossary.
 
 
 # Installation
@@ -77,9 +77,11 @@ Load the necessary packages in R:
 library(HCATonsilData)
 library(SingleCellExperiment)
 library(ExperimentHub)
+library(scater)
 library(ggplot2)
 library(knitr)
 library(kableExtra)
+library(htmltools)
 ```
 
 
@@ -140,14 +142,14 @@ knitr::include_graphics("tonsil_atlas_n_detected_genes.png")
 
 Because we did not want to bias the clustering towards the modality that
 provides less information, we first analyzed scRNA-seq and Multiome together,
-and use CITE-seq to validate the annotation (see below). However, a recent
+and used CITE-seq to validate the annotation (see below). However, a recent
 benchmarking effort showed that scRNA-seq and single-nuclei RNA-seq (such as
 Multiome) mix very poorly [@mereu2020benchmarking]. Indeed, we observed massive
 batch effects between both modalities (see manuscript). To overcome it, we
 found highly variable genes (HVG) for each modality independently. We then
 intersected both sets of HVG to remove modality-specific variation. Following
 principal component analysis (PCA), we integrated scRNA-seq and Multiome with
-Harmony [@mereu2020benchmarking]. Harmony scales well to atlas-level datasets
+Harmony [@korsunsky2019fast]. Harmony scales well to atlas-level datasets
 and ranks among the best-performing tools in different benchmarks.
 
 These steps are performed using [SLOcatoR](https://github.com/massonix/SLOcatoR)
@@ -183,6 +185,7 @@ per assay in the discovery cohort:
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics("tonsil_atlas_umaps.png")
 ```
+
 We then applied SLOcatoR to annotate cells from the validation cohort (1) to confirm
 the presence, annotation and markers of cell types; (2) to extend the atlas
 through an integrated validation dataset, and (3) to chart compositional
@@ -204,8 +207,8 @@ knitr::include_graphics("tonsil_atlas_umap_discovery_validation_cohort_CD4.png")
 Overall, we could validate most of the cell types, as they preserved their
 marker genes and had a high annotation confidence in the validation cohort.
 However, (1) transient cell states, (2) underrepresented cell types, or
-(3) clusters that are at the intersection between two main compartments and
-might represent doublets had low annotation confidences. We provide this
+(3) clusters that are at the intersection between two main compartments (and
+might represent doublets) had low annotation confidences. We provide this
 interpretation in the Glossary (see below).
 
 
@@ -214,19 +217,8 @@ interpretation in the Glossary (see below).
 HCATonsilData provides access to 5 main types of assays: RNA, ATAC, Multiome
 CITE-seq and Spatial.
 
+
 ## RNA
-
-TODO: mention HCATonsilDataInfo, describe that the first time the dataset is downloaded might take longer (depending on size of tha dataset), but once it's downloaded HCATonsilAtlas will upload it from cache instead, speededing up things.
-
-TODO: mention color palettes, same as in paper
-
-TODO: mention timestamped annotation. open an issue if needed
-
-TODO: mention how to save .h5ad --> INTEROPERABILITY!!
-
-TODO: only show example with epithelial: needs to be fast!!! version 1.0 and 2.0
-
-TODO: include spatial and Rna=All downloads, but with eval=FALSE
 
 We can obtain the `SingleCellExperiment` object with gene expression (RNA)
 data as follows:
@@ -236,30 +228,30 @@ data as follows:
 table(sce$assay)
 ```
 
-As you can see, this object consists of 377,988 profiled with scRNA-seq (3P)
+This object consists of 377,988 profiled with scRNA-seq (3P)
 and 84,364 cells profiled with multiome. We can dowload a `SingleCellExperiment`
 object specific to each of the main subpopulations defined at level 1 as follows:
 
 ```{r}
 listCellTypes(assayType = "RNA")
 (epithelial <- HCATonsilData(assayType = "RNA", cellType = "epithelial"))
-# df <- as.data.frame(colData(epithelial))
-# ggplot(df, aes(UMAP_1_20220215, UMAP_2_20220215, col = annotation_20230508)) +
-#   geom_point() +
-#   scale_color_manual(values = cols) +
-#   labs(title = "Annotation 20230508", x = "UMAP1", y = "UMAP2") +
-#   theme_classic() +
-#   theme(
-#     plot.title = element_text(hjust = 0.5),
-#     legend.title = element_blank(),
-#     axis.text = element_blank(),
-#     axis.ticks = element_blank()
-#   )
+data("colors_20230508")
+scater::plotUMAP(epithelial, colour_by = "annotation_20230508") +
+  ggplot2::scale_color_manual(values = colors_20230508$epithelial) +
+  ggplot2::theme(legend.title = ggplot2::element_blank())
 ```
 
-As we can see, the annotation we are currently using has a date associated with
-it. If other immunologists look at the data and propose modifications, we will
-add additional time-stamped annotations in future releases of `HCATonsilData`.
+As we can see, we can use the same colors as in the publication using the
+`colors_20230508` variable.
+
+We can also download datasets from the preprint (discovery cohort, version 1.0):
+
+```{r}
+(epithelial <- HCATonsilData("RNA", "epithelial", version = "1.0"))
+scater::plotUMAP(epithelial, colour_by = "annotation_20230508") +
+  ggplot2::scale_color_manual(values = colors_20230508$epithelial) +
+  ggplot2::theme(legend.title = ggplot2::element_blank())
+```
 
 
 Here's a brief explanation of all the variables in the colData slot of the
@@ -413,38 +405,71 @@ scirpy_df <- read.csv(
 
 ## Spatial
 
-Coming soon! (TODO) For now you can download the original `Seurat` object with the
-following code:
+A `r BiocStyle::Biocpkg("SpatialExperiment")` of the [spatial transcriptomics]([10X Visium](https://www.10xgenomics.com/products/spatial-gene-expression)) may be retrieved via `assayType="Spatial"`. The dataset contains 8 tissue slices with ~1,000-3,000 cells each that were profiled on two separated slides, as well as a low-resolution (H&E staining) image for each slice.
 
 ```{r eval=FALSE}
-(spatial <- HCATonsilData(assayType = "Spatial"))
-
-# TODO Helena: Document basic slots of SpatialExperiment object
+library(SpatialExperiment)
+(spe <- HCATonsilData(assayType = "Spatial"))
 ```
 
 
+# Annotations
 
-# Explore data with iSEE
+To allow users to traceback the rationale behind each and every of our annotations,
+we provide a detailed glossary of 121 cell types and states and related functions
+to get the explanation, markers and references of every annotation. You can acces
+the glossary as a dataframe as follows:
 
-Coming soon! (TODO)
 
-# Exploring information on the Tonsil Data Atlas
-
-Yadda yadda TODO, one can read up info on this in two different manners
-
-```{r eval = FALSE}
-library("HCATonsilData")
-
-head(TonsilData_glossary())
-
-TonsilData_cellinfo("Th17")
+```{r}
+glossary_df <- TonsilData_glossary()
+head(glossary_df)
 ```
 
+
+To get the glossary for each cell type with nice printing formatting you can use
+the `TonsilData_cellinfo()` function:
+
+```{r}
+TonsilData_cellinfo("Tfr")
+```
+
+
+Alternatively, you can get a static html with links to markers and articles with
+`TonsilData_cellinfo_html`
 
 ```{r eval = FALSE}
 htmltools::includeHTML(
-  TonsilData_cellinfo_html("Th17", display_plot = TRUE)
+  TonsilData_cellinfo_html("Tfr", display_plot = TRUE)
 )
+```
+
+
+Although we have put massive effort in annotating tonsillar cell types, cell type
+annotations are dynamic by nature. New literature or other interpretations of the
+data can challenge and refine our annotations. To accommodate this, we have developed
+the `updateAnnotation` function, which allows to periodically provide newer
+annotations as extra columns in the `colData` slot of the `SingleCellExperiment`
+objects. If you want to contribute in one of these versions of the upcoming annotations,
+please [open an issue](https://github.com/massonix/HCATonsilData/issues/new) and
+describe your annotation.
+
+
+# Interoperability
+
+While we provide data in the form of SingleCellExperiment objects, you may want to
+analyze your data using a different single-cell data container. In future releases,
+we will strive to make the SingleCellExperiment objects compatible with
+[Seurat v5](https://github.com/satijalab/seurat), which will come out after this
+release of BioConductor. Alternatively, you may want to obtain
+[AnnData](https://anndata.readthedocs.io/en/latest/) objects to analyze your data
+in [scanpy](https://scanpy.readthedocs.io/en/stable/installation.html) ecosystem.
+You can convert and save the data as follows:
+
+```{r eval=FALSE}
+library(zellkonverter)
+epithelial <- HCATonsilData(assayType = "RNA", cellType = "epithelial")
+writeH5AD(sce = epithelial, file = "epithelial.h5ad")
 ```
 
 
