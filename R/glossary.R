@@ -21,8 +21,11 @@ TonsilData_glossary <- function() {
 
 
 #' TonsilData_cellinfo
+#' 
+#' Query the glossary to traceback the rationale for each annotation of the
+#' tonsil atlas
 #'
-#' @param cell_type String character, used to define the cell type for which the
+#' @param cellType String character, used to define the cell type for which the
 #' information will be displayed. Defaults to `NULL` - if left unspecified, the
 #' function returns a list of the possible options
 #'
@@ -37,29 +40,29 @@ TonsilData_glossary <- function() {
 #' TonsilData_cellinfo()
 #'
 #' TonsilData_cellinfo("PDC")
-TonsilData_cellinfo <- function(cell_type = NULL) {
+TonsilData_cellinfo <- function(cellType = NULL) {
 
   glossary_df <- TonsilData_glossary()
   slo_celltypes <- rownames(glossary_df)
 
-  if (is.null(cell_type)) {
+  if (is.null(cellType)) {
     message("Please select one of the following: ",
             paste0(slo_celltypes, collapse = "|"))
   } else {
 
-    if (cell_type %in% slo_celltypes) {
+    if (cellType %in% slo_celltypes) {
 
       cell_msg <- paste0(
-        glossary_df[cell_type, "annotation_detailed"],
+        glossary_df[cellType, "annotation_detailed"],
         "\n------------------------------",
         "\nAnnotation Level 1: ",
-        glossary_df[cell_type, "annotation_level_1"],
+        glossary_df[cellType, "annotation_level_1"],
         "\nCell Markers: ",
-        glossary_df[cell_type, "description"],
+        glossary_df[cellType, "description"],
         "\nCell Markers: ",
-        glossary_df[cell_type, "marker_genes"],
+        glossary_df[cellType, "marker_genes"],
         "\nRelated references: ",
-        glossary_df[cell_type, "related_refs"] # ,
+        glossary_df[cellType, "related_refs"] # ,
         # "\nCell Ontology terms: ",
         # glossary_df[matched_celltype, "related_cellontology"]
       )
@@ -111,7 +114,7 @@ TonsilData_cellinfo <- function(cell_type = NULL) {
 
 #' TonsilData_cellinfo_html
 #'
-#' @param cell_type String character, used to define the cell type for which the
+#' @param cellType String character, used to define the cell type for which the
 #' information will be displayed. Defaults to `NULL` - if left unspecified, the
 #' function returns a list of the possible options
 #' @param display_plot Logical value, defines whether to include or not a plot
@@ -135,7 +138,7 @@ TonsilData_cellinfo <- function(cell_type = NULL) {
 #' TonsilData_cellinfo_html("preB")
 #' TonsilData_cellinfo_html("preT")
 #' TonsilData_cellinfo_html("preT", output_to = "html_to_embed")
-TonsilData_cellinfo_html <- function(cell_type = NULL,
+TonsilData_cellinfo_html <- function(cellType = NULL,
                                      display_plot = TRUE,
                                      output_to = c("single_page", "html_to_embed")) {
 
@@ -144,29 +147,29 @@ TonsilData_cellinfo_html <- function(cell_type = NULL,
   glossary_df <- TonsilData_glossary()
   slo_celltypes <- rownames(glossary_df)
 
-  if (is.null(cell_type)) {
+  if (is.null(cellType)) {
     message("Please select one of the following: ",
             paste0(slo_celltypes, collapse = "|"))
   } else {
 
-    if (cell_type %in% slo_celltypes) {
+    if (cellType %in% slo_celltypes) {
 
       cell_html_celltype <- paste0(
-        tags$b(cell_type),
+        tags$b(cellType),
         tags$br(),
         tags$b("Annotation Level 1: "),
-        glossary_df[cell_type, "annotation_level_1"],
+        glossary_df[cellType, "annotation_level_1"],
         tags$hr(),
         tags$br()
       )
 
       cell_html_celldescription <- paste0(
         tags$b("Cell type description: "),
-        glossary_df[cell_type, "description"],
+        glossary_df[cellType, "description"],
         tags$br(), tags$br()
       )
 
-      markers <- as.character(glossary_df[cell_type, "marker_genes"])
+      markers <- as.character(glossary_df[cellType, "marker_genes"])
       markers_split <- unlist(strsplit(markers, split = ",", fixed = TRUE))
       markers_content <- paste(
         unlist(lapply(markers_split, function(id) .link_marker(id))),
@@ -180,7 +183,7 @@ TonsilData_cellinfo_html <- function(cell_type = NULL,
         tags$br()
       )
 
-      refs <- as.character(glossary_df[cell_type, "related_refs"])
+      refs <- as.character(glossary_df[cellType, "related_refs"])
       refs_split <- unlist(strsplit(refs, split = ";", fixed = TRUE))
       refs_split_names <- unlist(lapply(
         strsplit(refs_split, split = "|", fixed = TRUE),
@@ -204,7 +207,7 @@ TonsilData_cellinfo_html <- function(cell_type = NULL,
         tags$br()
       )
 
-      # cellonts <- as.character(glossary_df[cell_type, "related_cellontology"])
+      # cellonts <- as.character(glossary_df[cellType, "related_cellontology"])
       # cellonts_split <- unlist(strsplit(cellonts, split = ",", fixed = TRUE))
       # cellonts_content <- paste(
       #   unlist(lapply(cellonts_split, function(id) .link_cellontology(id))),
@@ -216,10 +219,9 @@ TonsilData_cellinfo_html <- function(cell_type = NULL,
       #   tags$br()
       # )
 
-      ## TODO:
-      # handle the part with including the umap plot, specifically for that subset
+      # UMAP plot
       if (display_plot) {
-        img_location <- glossary_df[cell_type, "umap_png"]
+        img_location <- glossary_df[cellType, "umap_png"]
         img_html <-
           paste0(
             tags$img(

@@ -5,13 +5,13 @@
 \title{TonsilData_cellinfo_html}
 \usage{
 TonsilData_cellinfo_html(
-  cell_type = NULL,
+  cellType = NULL,
   display_plot = TRUE,
   output_to = c("single_page", "html_to_embed")
 )
 }
 \arguments{
-\item{cell_type}{String character, used to define the cell type for which the
+\item{cellType}{String character, used to define the cell type for which the
 information will be displayed. Defaults to \code{NULL} - if left unspecified, the
 function returns a list of the possible options}
 

@@ -4,10 +4,10 @@
 \alias{TonsilData_cellinfo}
 \title{TonsilData_cellinfo}
 \usage{
-TonsilData_cellinfo(cell_type = NULL)
+TonsilData_cellinfo(cellType = NULL)
 }
 \arguments{
-\item{cell_type}{String character, used to define the cell type for which the
+\item{cellType}{String character, used to define the cell type for which the
 information will be displayed. Defaults to \code{NULL} - if left unspecified, the
 function returns a list of the possible options}
 }
@@ -16,7 +16,8 @@ Invisible \code{NULL} - the information is displayed as a message in the
 console.
 }
 \description{
-TonsilData_cellinfo
+Query the glossary to traceback the rationale for each annotation of the
+tonsil atlas
 }
 \examples{
 TonsilData_cellinfo()
