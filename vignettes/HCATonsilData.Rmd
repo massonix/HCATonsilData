@@ -20,7 +20,7 @@ bibliography: HCATonsilData.bib
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = FALSE
+  eval = TRUE
 )
 ```
 
