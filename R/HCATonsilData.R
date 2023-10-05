@@ -198,7 +198,8 @@ HCATonsilData <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
       reducedDims = dr,
       imgData = images,
       rowData = rowdata,
-      colData = coldata
+      colData = coldata,
+      spatialCoordsNames = c("imagecol", "imagerow")
     )
   }
 
