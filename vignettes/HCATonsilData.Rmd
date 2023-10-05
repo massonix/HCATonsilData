@@ -74,14 +74,14 @@ BiocManager::install("HCATonsilData")
 Load the necessary packages in R:
 
 ```{r message=FALSE}
-library(HCATonsilData)
-library(SingleCellExperiment)
-library(ExperimentHub)
-library(scater)
-library(ggplot2)
-library(knitr)
-library(kableExtra)
-library(htmltools)
+library("HCATonsilData")
+library("SingleCellExperiment")
+library("ExperimentHub")
+library("scater")
+library("ggplot2")
+library("knitr")
+library("kableExtra")
+library("htmltools")
 ```
 
 
@@ -297,8 +297,8 @@ using [Signac](https://stuartlab.org/signac/) [@stuart2021single].
 Here are the instructions to download the scATAC-seq object:
 
 ```{r eval=FALSE}
-library(Seurat)
-library(Signac)
+library("Seurat")
+library("Signac")
 dir.create("download_dir")
 options(timeout = 10000000)
 atac_url <- "https://zenodo.org/record/8373756/files/TonsilAtlasSeuratATAC.tar.gz"
@@ -314,8 +314,8 @@ The multiome object contains 68,749 cells that passed both RNA and ATAC QC filte
 Here are the instructions to download the Multiome object:
 
 ```{r eval=FALSE}
-library(Seurat)
-library(Signac)
+library("Seurat")
+library("Signac")
 dir.create("download_dir")
 options(timeout = 10000000)
 multiome_url <- "https://zenodo.org/record/8373756/files/TonsilAtlasSeuratMultiome.tar.gz"
@@ -408,7 +408,7 @@ scirpy_df <- read.csv(
 A `r BiocStyle::Biocpkg("SpatialExperiment")` of the [spatial transcriptomics]([10X Visium](https://www.10xgenomics.com/products/spatial-gene-expression)) may be retrieved via `assayType="Spatial"`. The dataset contains 8 tissue slices with ~1,000-3,000 cells each that were profiled on two separated slides, as well as a low-resolution (H&E staining) image for each slice.
 
 ```{r eval=FALSE}
-library(SpatialExperiment)
+library("SpatialExperiment")
 (spe <- HCATonsilData(assayType = "Spatial"))
 ```
 
@@ -417,7 +417,7 @@ library(SpatialExperiment)
 
 To allow users to traceback the rationale behind each and every of our annotations,
 we provide a detailed glossary of 121 cell types and states and related functions
-to get the explanation, markers and references of every annotation. You can acces
+to get the explanation, markers and references of every annotation. You can access
 the glossary as a dataframe as follows:
 
 
@@ -467,7 +467,7 @@ in [scanpy](https://scanpy.readthedocs.io/en/stable/installation.html) ecosystem
 You can convert and save the data as follows:
 
 ```{r eval=FALSE}
-library(zellkonverter)
+library("zellkonverter")
 epithelial <- HCATonsilData(assayType = "RNA", cellType = "epithelial")
 writeH5AD(sce = epithelial, file = "epithelial.h5ad")
 ```
