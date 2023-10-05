@@ -137,16 +137,49 @@ imgData names(4): sample_id image_id data scaleFactor
 
 ## Annotations
 
+To allow users to traceback the rationale behind each and every of our annotations,
+we provide a detailed glossary of 121 cell types and states and related functions
+to get the explanation, markers and references of every annotation. You can acces
+the glossary as a dataframe as follows:
+
+
+```{r}
+glossary_df <- TonsilData_glossary()
+```
+
+To get the glossary for each cell type with nice printing formatting you can use
+the `TonsilData_cellinfo()` function:
+
+```{r}
+TonsilData_cellinfo("Tfr")
+```
+```
+Tfr
+------------------------------
+Annotation Level 1: CD4_T
+Cell Markers: T-follicular regulatory cells in the tonsils are CD25-. These cells down-regulate effector Treg markers (IL2RA, FOXP3, CTLA4). This cluster expressed high levels of FCRL3, CLNK, LEF1, TCF7, RBMS3, SESN3, and PDE3B. The top marker FCRL3 can bind secretory IgA to suppress the Tfr inhibitory function. TCF7 and LEF1 are essential for Tfr development in mice (Wing et al., 2017; Agarwal et al., 2020 ; Yang et al., 2019).
+Cell Markers: FCRL3,CLNK,LEF1,TCF7,RBMS3,SESN3,PDE3B
+Related references: Wing2017|10.1073/pnas.1705551114;Agarwal2020|10.1016/j.celrep.2019.12.099;Yang2019|10.1016/j.celrep.2019.05.061
+```
+
+Alternatively, you can get a static html with links to markers and articles with
+`TonsilData_cellinfo_html`
+
+```
+TonsilData_cellinfo_html("Tfr")
+```
+
+![](HCATonsilData/vignettes/tfr_glossary.png)
+
 Although we have put massive effort in annotating tonsillar cell types, cell type
 annotations are dynamic by nature. New literature or other interpretations of the
-data can challenge and refine our annotations. To accomodate this, we have developed
+data can challenge and refine our annotations. To accommodate this, we have developed
 the `updateAnnotation` function, which allows to periodically provide newer
 annotations as extra columns in the `colData` slot of the `SingleCellExperiment`
 objects. If you want to contribute in one of these versions of the upcoming annotations,
 please [open an issue](https://github.com/massonix/HCATonsilData/issues/new) and
 describe your annotation.
 
-TODO: include glossary
 
 
 ## Interoperability

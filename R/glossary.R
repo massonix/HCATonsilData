@@ -21,6 +21,9 @@ TonsilData_glossary <- function() {
 
 
 #' TonsilData_cellinfo
+#' 
+#' Query the glossary to traceback the rationale for each annotation of the
+#' tonsil atlas
 #'
 #' @param cellType String character, used to define the cell type for which the
 #' information will be displayed. Defaults to `NULL` - if left unspecified, the
@@ -216,8 +219,7 @@ TonsilData_cellinfo_html <- function(cellType = NULL,
       #   tags$br()
       # )
 
-      ## TODO:
-      # handle the part with including the umap plot, specifically for that subset
+      # UMAP plot
       if (display_plot) {
         img_location <- glossary_df[cellType, "umap_png"]
         img_html <-
