@@ -33,6 +33,8 @@ library(SpatialExperiment)
 library(tools)
 library(dplyr)
 library(readr)
+library(purrr)
+library(tibble)
 ```
 
 
@@ -118,7 +120,10 @@ for (dr in Reductions(so)) {
 
 
 # 'colData'
-cd <- DataFrame(so@meta.data)
+spatial_coordinates <- map_df(Images(so), \(.) so@images[[.]]@coordinates)
+spatial_coordinates <- rownames_to_column(spatial_coordinates, "barcode")
+cell_metadata <- left_join(so@meta.data, spatial_coordinates, by = "barcode")
+cd <- DataFrame(cell_metadata)
 cd$sample_id <- cd$gem_id # needed for SPE
 saveRDS(cd, file.path(out_dir, "Spatial_coldata.rds"))
 

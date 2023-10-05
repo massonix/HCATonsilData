@@ -20,7 +20,7 @@ bibliography: HCATonsilData.bib
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = FALSE
+  eval = TRUE
 )
 ```
 
@@ -44,7 +44,7 @@ differentiation into long-lived plasma cells (PC) or memory B cells (MBC)
 [@de2015dynamics].
 
 In the context of the Human Cell Atlas (HCA) [@regev2018human], we have created 
-a taxonomy of 121 cell types and states in a human tonsil. Since the transcritpome
+a taxonomy of 121 cell types and states in a human tonsil. Since the transcriptome
 is just a snapshot of a cell's state [@wagner2016revealing], we have added other
 layers to define cell identity: single-cell resolved open chromatin epigenomic
 landscapes (scATAC-seq and scRNA/ATAC-seq; i.e. Multiome) as well as protein
@@ -74,14 +74,14 @@ BiocManager::install("HCATonsilData")
 Load the necessary packages in R:
 
 ```{r message=FALSE}
-library(HCATonsilData)
-library(SingleCellExperiment)
-library(ExperimentHub)
-library(scater)
-library(ggplot2)
-library(knitr)
-library(kableExtra)
-library(htmltools)
+library("HCATonsilData")
+library("SingleCellExperiment")
+library("ExperimentHub")
+library("scater")
+library("ggplot2")
+library("knitr")
+library("kableExtra")
+library("htmltools")
 ```
 
 
@@ -95,6 +95,8 @@ which we used to validate the presence, annotation and markers of the discovered
 cell types. The following table corresponds to the donor-level metadata:
 
 ```{r}
+data("donor_metadata")
+
 kable(
   donor_metadata,
   format = "markdown",
@@ -281,7 +283,7 @@ Here's a brief explanation of all the variables in the colData slot of the
 * annotation_level_1: annotation used at our level 1 clustering (9 main compartments).
 * annotation_level_1_probability: annotation confidence for the level 1 annotation (relevant for validation cohort, as it implied KNN annotation)
 * annotation_figure_1: annotation used in the figure 1 of our manuscript. This annotation consisted of grouping the final subtypes into main cell types that were distinguishable in the UMAP.
-* annotation_20220215, annotation_20220619, annotation_20230508: time-stampled annotation for cell types.
+* annotation_20220215, annotation_20220619, annotation_20230508: time-stamped annotation for cell types.
 * annotation_20230508_probability: annotation confidence for the final annotation (relevant for validation cohort, as it implied KNN annotation)
 * UMAP_1_level_1, UMAP_2_level_1: UMAP1 coordinates of the figure 1B of the article.
 * annotation_20220215: see above.
@@ -297,8 +299,8 @@ using [Signac](https://stuartlab.org/signac/) [@stuart2021single].
 Here are the instructions to download the scATAC-seq object:
 
 ```{r eval=FALSE}
-library(Seurat)
-library(Signac)
+library("Seurat")
+library("Signac")
 dir.create("download_dir")
 options(timeout = 10000000)
 atac_url <- "https://zenodo.org/record/8373756/files/TonsilAtlasSeuratATAC.tar.gz"
@@ -314,8 +316,8 @@ The multiome object contains 68,749 cells that passed both RNA and ATAC QC filte
 Here are the instructions to download the Multiome object:
 
 ```{r eval=FALSE}
-library(Seurat)
-library(Signac)
+library("Seurat")
+library("Signac")
 dir.create("download_dir")
 options(timeout = 10000000)
 multiome_url <- "https://zenodo.org/record/8373756/files/TonsilAtlasSeuratMultiome.tar.gz"
@@ -369,8 +371,8 @@ the meaning of the variables that are specific to Multiome or scATAC-seq:
 * nucleosome_percentile: percentile rank of each ratio of mononucleosomal to nucleosome-free fragments per cell (see [NucleosomeSignal](https://stuartlab.org/signac/reference/nucleosomesignal) function)
 * TSS.enrichment: as explained in Signac, *The ENCODE project has defined an ATAC-seq targeting score based on the ratio of fragments centered at the TSS to fragments in TSS-flanking regions (see https://www.encodeproject.org/data-standards/terms/). Poor ATAC-seq experiments typically will have a low TSS enrichment score.*
 * TSS.percentile
-* RNA.weight: the weight that RNA has in the weighted nearest neihbor graph per cell (multiome-specific)
-* ATAC.weight: the weight that RNA has in the weighted nearest neihbor graph per cell (multiome-specific)
+* RNA.weight: the weight that RNA has in the weighted nearest neighbor graph per cell (multiome-specific)
+* ATAC.weight: the weight that RNA has in the weighted nearest neighbor graph per cell (multiome-specific)
 
 
 ## CITE-seq
@@ -378,7 +380,7 @@ the meaning of the variables that are specific to Multiome or scATAC-seq:
 The CITE-seq object can be downloaded as follows:
 
 ```{r eval=FALSE}
-library(Seurat)
+library("Seurat")
 dir.create("download_dir")
 options(timeout = 10000000)
 cite_url <- "https://zenodo.org/record/8373756/files/TonsilAtlasSeuratCITE.tar.gz"
@@ -408,7 +410,7 @@ scirpy_df <- read.csv(
 A `r BiocStyle::Biocpkg("SpatialExperiment")` of the [spatial transcriptomics]([10X Visium](https://www.10xgenomics.com/products/spatial-gene-expression)) may be retrieved via `assayType="Spatial"`. The dataset contains 8 tissue slices with ~1,000-3,000 cells each that were profiled on two separated slides, as well as a low-resolution (H&E staining) image for each slice.
 
 ```{r eval=FALSE}
-library(SpatialExperiment)
+library("SpatialExperiment")
 (spe <- HCATonsilData(assayType = "Spatial"))
 ```
 
@@ -417,7 +419,7 @@ library(SpatialExperiment)
 
 To allow users to traceback the rationale behind each and every of our annotations,
 we provide a detailed glossary of 121 cell types and states and related functions
-to get the explanation, markers and references of every annotation. You can acces
+to get the explanation, markers and references of every annotation. You can access
 the glossary as a dataframe as follows:
 
 
@@ -467,7 +469,7 @@ in [scanpy](https://scanpy.readthedocs.io/en/stable/installation.html) ecosystem
 You can convert and save the data as follows:
 
 ```{r eval=FALSE}
-library(zellkonverter)
+library("zellkonverter")
 epithelial <- HCATonsilData(assayType = "RNA", cellType = "epithelial")
 writeH5AD(sce = epithelial, file = "epithelial.h5ad")
 ```

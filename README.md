@@ -79,10 +79,10 @@ listCellTypes(assayType = "RNA")
 
 HCATonsilAtlas data allows to install scRNA-seq and spatial transcriptomics data
 as SingleCellExperiments and SpatialExperiments, respectively. For scATAC-seq, 
-Multiome, and CITE-seq we provide in the vignettethe instructions on how to access
+Multiome, and CITE-seq we provide in the vignette the instructions on how to access
 the data archived at [Zenodo](https://zenodo.org/record/8373756) 
 Note that for now HCATonsilAtlas only provides access to RNA data, but we are
-working hard to extend it to other modalities, which are/will be arhived in 
+working hard to extend it to other modalities, which are/will be archived in 
 [Zenodo](https://doi.org/10.5281/zenodo.6340174) as [Seurat objects](https://satijalab.org/seurat/).
 
 To obtain the `SingleCellExperiment` object associated with a given cell type we use
