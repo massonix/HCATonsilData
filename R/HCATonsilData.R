@@ -49,13 +49,13 @@ HCATonsilData <- function(assayType = c("RNA", "ATAC", "CITE", "Spatial"),
 
   # Point users to the vignette to download scATAC-seq, Multiome or CITE-seq data
   if (assayType %in% c("ATAC", "Multiome", "CITE")) {
-    print(paste(
-      "Check the corresponding section in the vignette to download",
-      assayType,
-      "data",
-      sep = " "
-    ))
-    print("Please run browseVignettes('HCATonsilData')")
+    message(
+      sprintf(
+        "Check the corresponding section in the vignette to download %s data",
+        assayType
+      )
+    )
+    message("Please run browseVignettes('HCATonsilData')")
   }
 
   # Download scRNA-seq data and return a SingleCellExperiment if assay is RNA
