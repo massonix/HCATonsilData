@@ -246,15 +246,22 @@ scater::plotUMAP(epithelial, colour_by = "annotation_20230508") +
 As we can see, we can use the same colors as in the publication using the
 `colors_20230508` variable.
 
-We can also download datasets from the preprint (discovery cohort, version 1.0):
+We can also download datasets from the preprint (discovery cohort, version 1.0) - 
+we first load a list of matched annotations used throughout the course of the 
+project, used internally by the main `HCATonsilData()` function:
 
 ```{r}
+data("annotations_dictionary")
+annotations_dictionary[["dict_20220619_to_20230508"]]
+
+# load also a predefined palette of colors, to match the ones used in the manuscript 
+data("colors_20230508")
+
 (epithelial <- HCATonsilData("RNA", "epithelial", version = "1.0"))
 scater::plotUMAP(epithelial, colour_by = "annotation_20230508") +
   ggplot2::scale_color_manual(values = colors_20230508$epithelial) +
   ggplot2::theme(legend.title = ggplot2::element_blank())
 ```
-
 
 Here's a brief explanation of all the variables in the colData slot of the
 `SingleCellExperiment` objects:
