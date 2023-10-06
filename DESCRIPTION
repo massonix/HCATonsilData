@@ -39,7 +39,6 @@ Suggests:
     ggplot2,
     testthat (>= 3.0.0),
     scater,
-    ggplot2,
     ggspavis,
     kableExtra,
     BiocStyle
