@@ -1,6 +1,6 @@
 Package: HCATonsilData
 Title: Provide programmatic access to the tonsil cell atlas datasets 
-Version: 0.99.1
+Version: 0.99.2
 Authors@R: c(person("Ramon", "Massoni-Badosa", role = c("aut", "cre"),
                     email ="ramon.massoni@cnag.crg.eu",
                     comment = c(ORCID = "0000-0001-7115-8145")),
