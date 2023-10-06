@@ -1,5 +1,9 @@
 # HCATonsilData
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/massonix/HCATonsilData/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/massonix/HCATonsilData/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 HCATonsilData is an R/ExperimentHub package that provides easy access to
 single-cell RNA-seq (scRNA-seq), single-cell ATAC-seq (scATAC-seq), 10X Multiome,
 CITE-seq and spatial transcriptomics data (Visium) derived from the tonsil cell
