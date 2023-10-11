@@ -535,7 +535,17 @@ epithelial <- HCATonsilData(assayType = "RNA", cellType = "epithelial")
 writeH5AD(sce = epithelial, file = "epithelial.h5ad")
 ```
 
+The SingleCellExperiment objects obtained via `HCATonsilData()` can be explored in 
+detail using e.g. additional Bioconductor packages, such as the `iSEE` package.
 
+This can be as simple as executing this chunk:
+
+```{r launchisee, eval=FALSE}
+if (require(iSEE)) {
+  iSEE(epithelial)
+}
+```
+ 
 # Session information {-}
 
 ```{r}

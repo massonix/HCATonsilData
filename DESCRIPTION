@@ -41,6 +41,7 @@ Suggests:
     scater,
     Seurat,
     Signac,
+    iSEE,
     ggspavis,
     kableExtra,
     BiocStyle
