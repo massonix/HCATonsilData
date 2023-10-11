@@ -216,11 +216,11 @@ interpretation in the Glossary (see below).
 
 # Assay types
 
-HCATonsilData provides access to 5 main types of assays: RNA, ATAC, Multiome
+HCATonsilData provides access to 5 main types of assays: RNA, ATAC, Multiome, 
 CITE-seq and Spatial.
 
 
-## RNA
+## scRNA-seq
 
 We can obtain the `SingleCellExperiment` object with gene expression (RNA)
 data as follows:
@@ -478,7 +478,7 @@ please [open an issue](https://github.com/massonix/HCATonsilData/issues/new) and
 describe your annotation.
 
 
-# Interoperability
+# Interoperability with other frameworks
 
 While we provide data in the form of SingleCellExperiment objects, you may want to
 analyze your data using a different single-cell data container. In future releases,
@@ -496,7 +496,7 @@ writeH5AD(sce = epithelial, file = "epithelial.h5ad")
 ```
 
 
-# Session information
+# Session information {-}
 
 ```{r}
 sessionInfo()
