@@ -231,8 +231,11 @@ table(sce$assay)
 ```
 
 This object consists of 377,988 profiled with scRNA-seq (3P)
-and 84,364 cells profiled with multiome. We can dowload a `SingleCellExperiment`
-object specific to each of the main subpopulations defined at level 1 as follows:
+and 84,364 cells profiled with multiome, for a total of 462,352 cells (37,378
+genes were quantified across all of these).
+
+We can dowload a `SingleCellExperiment` object specific to each of the main 
+subpopulations defined at level 1 as follows:
 
 ```{r}
 listCellTypes(assayType = "RNA")
