@@ -41,6 +41,7 @@ Suggests:
     scater,
     Seurat,
     Signac,
+    zellkonverter,
     iSEE,
     ggspavis,
     kableExtra,
