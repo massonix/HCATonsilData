@@ -535,7 +535,10 @@ You can convert and save the data as follows:
 ```{r eval=FALSE}
 library("zellkonverter")
 epithelial <- HCATonsilData(assayType = "RNA", cellType = "epithelial")
-writeH5AD(sce = epithelial, file = "epithelial.h5ad")
+
+epi_anndatafile <- file.path(tempdir(), "epithelial.h5ad")
+
+writeH5AD(sce = epithelial, file = epi_anndatafile)
 ```
 
 The SingleCellExperiment objects obtained via `HCATonsilData()` can be explored in 
