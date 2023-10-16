@@ -504,7 +504,7 @@ TonsilData_cellinfo("Tfr")
 Alternatively, you can get a static html with links to markers and articles with
 `TonsilData_cellinfo_html`
 
-```{r eval = FALSE}
+```{r eval = TRUE}
 htmltools::includeHTML(
   TonsilData_cellinfo_html("Tfr", display_plot = TRUE)
 )
